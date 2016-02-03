@@ -97,6 +97,9 @@ ${telephone}     +380976535447
   Run keyword if   '${mode}' == 'multi'   Set Multi Ids   ${tender_UAid}
   [return]  ${Ids}
 
+Вхід
+
+
 Set Multi Ids
   [Arguments]  @{ARGUMENTS}
   [Documentation]
