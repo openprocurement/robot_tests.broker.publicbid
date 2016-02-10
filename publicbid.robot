@@ -2,6 +2,7 @@
 Library  Selenium2Screenshots
 Library  String
 Library  DateTime
+Library  publicbid_service.py
 
 *** Variables ***
 ${mail}          test@mail.com
@@ -40,16 +41,22 @@ ${new_description}  Новое описание тендера
   ...      ${ARGUMENTS[1]} ==  tender_data
   Log  ${ARGUMENTS[1]}
   ${file_path}=        local_path_to_file   TestDocument.docx
-  ${prepared_tender_data}=   Add_data_for_GUI_FrontEnds   ${ARGUMENTS[1]}
-  ${items}=         Get From Dictionary   ${prepared_tender_data.data}               items
-  ${title}=         Get From Dictionary   ${prepared_tender_data.data}               title
-  ${description}=   Get From Dictionary   ${prepared_tender_data.data}               description
-  ${budget}=        Get From Dictionary   ${prepared_tender_data.data.value}         amount
-  ${step_rate}=     Get From Dictionary   ${prepared_tender_data.data.minimalStep}   amount
-  ${countryName}=   Get From Dictionary   ${prepared_tender_data.data.procuringEntity.address}       countryName
+  ${prepared_tender_data}=  Get From Dictionary  ${ARGUMENTS[1]}  data
+  ${items}=         Get From Dictionary   ${prepared_tender_data}               items
+  ${title}=         Get From Dictionary   ${prepared_tender_data}               title
+  ${description}=   Get From Dictionary   ${prepared_tender_data}               description
+  ${budget}=        Get From Dictionary   ${prepared_tender_data.value}         amount
+  ${step_rate}=     Get From Dictionary   ${prepared_tender_data.minimalStep}   amount
+  ${enquiry_period}=  Get From Dictionary  ${prepared_tender_data}  enquiryPeriod
+  ${enquiry_period_end_date}=  publicbid_service.convert_date_to_string  ${enquiry_period.endDate}
+  ${tender_period}=  Get From Dictionary  ${prepared_tender_data}  tenderPeriod
+  ${tender_period_start_date}=  publicbid_service.convert_date_to_string  ${tender_period.startDate}
+  ${tender_period_end_date}=  publicbid_service.convert_date_to_string  ${tender_period.endDate}
+  ${countryName}=   Get From Dictionary   ${prepared_tender_data.procuringEntity.address}       countryName
   ${item_description}=  Get From Dictionary  ${items[0]}  description
   ${delivery_end_date}=      Get From Dictionary   ${items[0].deliveryDate}   endDate
-  ${delivery_end_date}=      convert_datetime_to_dot_format  ${delivery_end_date}
+  ${delivery_end_date}=      publicbid_service.convert_item_date_to_string  ${delivery_end_date}
+  ${item_delivery_address_street_address}=  Get From Dictionary  ${items[0].deliveryAddress}  streetAddress
   ${cpv}=           Convert To String     "Картонки"
   ${cpv_id}=           Get From Dictionary   ${items[0].classification}         id
   ${cpv_id_1}=           Get Substring    ${cpv_id}   0   3
@@ -57,7 +64,7 @@ ${new_description}  Новое описание тендера
   ${dkpp_id}=       Get From Dictionary   ${items[0].additionalClassifications[0]}  id
   ${code}=           Get From Dictionary   ${items[0].unit}          code
   ${quantity}=      Get From Dictionary   ${items[0]}                        quantity
-  ${name}=      Get From Dictionary   ${prepared_tender_data.data.procuringEntity.contactPoint}       name
+  ${name}=      Get From Dictionary   ${prepared_tender_data.procuringEntity.contactPoint}       name
 
   Selenium2Library.Switch Browser     ${ARGUMENTS[0]}
   Wait Until Page Contains Element    xpath=//*[contains(@class, 'ui-button-text ui-c')][./text()='Нова закупівля']   10
@@ -67,8 +74,10 @@ ${new_description}  Новое описание тендера
   Input text                          id=mForm:data:desc     ${description}
   Input text                          id=mForm:data:budget   ${budget}
   Input text                          id=mForm:data:step     ${step_rate}
+  Input text                          xpath=//*[@id="mForm:data:dEA_input"]  ${enquiry_period_end_date}
+  Input text                          xpath=//*[@id="mForm:data:dSPr_input"]  ${tender_period_start_date}
+  Input text                          xpath=//*[@id="mForm:data:dEPr_input"]  ${tender_period_end_date}
   Click Element                       xpath=//*[@id='mForm:data:vat']/tbody/tr/td[1]//span
-  Input text                          id=mForm:data:dEPr_input    ${delivery_end_date}
   Click Element                       id=mForm:data:cKind_label
   Click Element                       xpath=//div[@id='mForm:data:cKind_panel']//li[3]
   Input text                          id=mForm:data:cCpvGr_input      ${cpv_id_1}
@@ -85,6 +94,8 @@ ${new_description}  Новое описание тендера
   Input text                          id=mForm:data:cDkpp0_input    ${dkpp_id}
   Wait Until Page Contains Element    xpath=//div[@id='mForm:data:cDkpp0_panel']//tr[1]/td[2]/span   10
   Click Element                       xpath=//div[@id='mForm:data:cDkpp0_panel']//tr[1]/td[2]/span
+  Input text                          xpath=//*[@id="mForm:data:delDE0_input"]  ${delivery_end_date}
+  Input text                          xpath=//*[@id="mForm:data:delAdr0"]  ${item_delivery_address_street_address}
   Input text                          id=mForm:data:rName    ${name}
   Input text                          id=mForm:data:rPhone    ${telephone}
   Input text                          id=mForm:data:rMail   ${mail}
@@ -92,7 +103,7 @@ ${new_description}  Новое описание тендера
   Sleep  2
   Run Keyword if   '${mode}' == 'multi'   Додати предмет   items
   # Save
-  Click Element                       id=mForm:bSave
+  Click Element                       xpath=//*[@id="mForm:bSave"]
   Sleep   20
   # Announce
   Click Element                       xpath=//span[text()="Оголосити"]
@@ -104,7 +115,7 @@ ${new_description}  Новое описание тендера
   # More smart wait for id is needed there.
   Sleep   2
 
-  :FOR    ${INDEX}    IN RANGE    1    12
+  :FOR    ${INDEX}    IN RANGE    1    25
   \  Exit For Loop If  '${bid_status}' == 'Період уточнень'
   \  Sleep  3
   \  ${bid_status}=  Get Text  xpath=//*[@id="mForm:data:status"]
@@ -241,17 +252,17 @@ Set Multi Ids
 
 Отримати інформацію про enquiryPeriod.endDate
   ${return_value}=  Get Value           xpath=//*[@id="mForm:data:dEA_input"]
-  #Нужно преобразовать дату в верный формат
+  ${return_value}=  publicbid_service.parse_date  ${return_value}
   [return]  ${return_value}
 
 Отримати інформацію про tenderPeriod.startDate
   ${return_value}=  Get Value           xpath=//*[@id="mForm:data:dSPr_input"]
-  #Нужно преобразовать дату в верный формат
+  ${return_value}=  publicbid_service.parse_date  ${return_value}
   [return]  ${return_value}
 
 Отримати інформацію про tenderPeriod.endDate
   ${return_value}=  Get Value           xpath=//*[@id="mForm:data:dEPr_input"]
-  #Нужно преобразовать дату в верный формат
+  ${return_value}=  publicbid_service.parse_date  ${return_value}
   [return]  ${return_value}
 
 Отримати інформацію про minimalStep.amount
@@ -280,6 +291,8 @@ Set Multi Ids
 
 Отримати інформацію про items[0].deliveryDate.endDate
   ${return_value}=  Get Value           xpath=//*[@id="mForm:data:delDE0_input"]
+  ${return_value}=  publicbid_service.parse_date  ${return_value}
+  Fail  "На майданчику не вказуються години і хвилини"
   [return]  ${return_value}
 
 Отримати інформацію про items[0].deliveryLocation.latitude
@@ -388,9 +401,36 @@ Set Multi Ids
   publicbid.Пошук тендера по ідентифікатору    ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   Reload Page
 
+Отримати інформацію про questions[0].title
+  Fail  "Анонімний користувач не може переглядати обговорення"
+  ${return_value}=  Get Text  xpath=//*[@id="mForm:data_data"]/tr/td[1]/span
+  [return]  ${return_value}
+
+Отримати інформацію про questions[0].description
+  Fail  "Анонімний користувач не може переглядати обговорення"
+  ${return_value}=  Get Text  xpath=//*[@id="mForm:data_data"]/tr/td[1]
+  [return]  ${return_value}
+
+Отримати інформацію про questions[0].date
+  Fail  "Анонімний користувач не може переглядати обговорення"
+  ${return_value}=  Get Text  xpath=//*[@id="mForm:data_data"]/tr/td[2]
+  [return]  ${return_value}
+
 Отримати інформацію про questions[0].answer
     ${return_value}=  Get Text  xpath=//*[@id="mForm:data_data"]/tr[1]/td[1]/span
     [return]  ${return_value}
+
+Подати цінову пропозицію
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...      ${ARGUMENTS[0]} ==  username
+  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
+  ...      ${ARGUMENTS[2]} ==  ${test_bid_data}
+  ${bid}=        Get From Dictionary   ${ARGUMENTS[2].data.value}         amount
+  publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
+  ${tender_status}=  Get Text  xpath=//*[@id="mForm:data:status"]
+  Run Keyword If  '${tender_status}' == 'Період уточнень'  Fail  "Неможливо подати цінову пропозицію в період уточнень"
+
 
 
 
