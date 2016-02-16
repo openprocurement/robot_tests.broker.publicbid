@@ -13,6 +13,13 @@ def parse_date(date_str):
     return date
 
 
+def parse_item_date(date_str):
+    date_str = datetime.strptime(date_str, "%d.%m.%Y")
+    date = datetime(date_str.year, date_str.month, date_str.day)
+    date = TZ.localize(date).isoformat()
+    return date
+
+
 def convert_date_to_string(date):
     date = dateutil.parser.parse(date)
     date = date.strftime("%d.%m.%Y %H:%M")
