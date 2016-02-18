@@ -436,12 +436,6 @@ Set Multi Ids
   publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   ${tender_status}=  Get Text  xpath=//*[@id="mForm:data:status"]
   Run Keyword If  '${tender_status}' == 'Період уточнень'  Fail  "Неможливо подати цінову пропозицію в період уточнень"
-#  :FOR    ${INDEX}    IN RANGE    1    25
-#  \  Exit For Loop If  '${bid_status}' == 'Очікування пропозицій'
-#  \  Sleep  3
-#  \  ${bid_status}=  Get Text  xpath=//*[@id="mForm:data:status"]
-#  \  Run Keyword If  '${bid_status}' != 'Очікування пропозицій'  Sleep  15
-#  \  Run Keyword If  '${bid_status}' != 'Очікування пропозицій'  Reload Page
   Click Element  xpath=//*[text()='Зареєструвати пропозицію']
   Sleep  2
   Input Text  xpath=//*[@id="mForm:data:amount"]  ${amount}
@@ -457,7 +451,39 @@ Set Multi Ids
   ${status}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[@id="mForm:opt1"]
   Run Keyword If  '${status}' == 'True'  Click Element  xpath=//*[@id="mForm:opt1"]/div[2]/span
   Run Keyword If  '${status}' == 'True'  Click Element  xpath=//*[text()='Подати пропозицію']
+  Sleep  5
+  ${bid_number}=  Get Text  xpath=//*[@id="mForm:data"]/div[1]/table/tbody/tr[1]/td[2]
   Sleep  80
+  [return]  ${bid_number}
+
+Скасувати цінову пропозицію
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...      ${ARGUMENTS[0]} ==  username
+  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
+  ...      ${ARGUMENTS[2]} ==  bid_number
+  Log Many  @{ARGUMENTS}
+  Пошук цінової пропозиції  ${ARGUMENTS[0]}  ${ARGUMENTS[2]}
+  Click Element  xpath=//*[text()='Відмінити пропозицію']
+  Click Element  xpath=//*[text()='Так']
+  Sleep  3
+
+
+Пошук цінової пропозиції
+  [Arguments]  @{ARGUMENTS}
+  [Documentation]
+  ...      ${ARGUMENTS[0]} ==  username
+  ...      ${ARGUMENTS[1]} ==  bid_number
+  Log Many  @{ARGUMENTS}
+  Switch browser   ${ARGUMENTS[0]}
+  Click Element  xpath=//*[text()='Мій кабінет']
+  Sleep  2
+  Click Element  xpath=//*[text()='Мої пропозиції']
+  Sleep  3
+  Click Element  xpath=//*[@id="mForm:propsRee_data"]/tr[1]/td[1]/div
+
+
+
 
 
 Відповісти на питання
