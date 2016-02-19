@@ -5,13 +5,8 @@ Library  DateTime
 Library  publicbid_service.py
 
 *** Variables ***
-${mail}          test@mail.com
-${telephone}     +380976535447
-${bid_status}
-
-${tender_title}
-
-${new_description}  Новое описание тендера
+${mail}          test_test@test.com
+${telephone}     +380630000000
 
 *** Keywords ***
 Підготувати клієнт для користувача
@@ -115,6 +110,7 @@ ${new_description}  Новое описание тендера
   # More smart wait for id is needed there.
   Sleep   2
 
+  ${bid_status}=  Get Text  xpath=//*[@id="mForm:data:status"]
   :FOR    ${INDEX}    IN RANGE    1    25
   \  Exit For Loop If  '${bid_status}' == 'Період уточнень'
   \  Sleep  3
@@ -280,6 +276,7 @@ Set Multi Ids
   publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   Wait Until Page Contains Element   xpath=//*[@id="mForm:data:status"]   10
   ${tender_status}=  Get Text  xpath=//*[@id="mForm:data:status"]
+  ${new_description}=  Convert To String  Новое описания тендера
   Run Keyword If  '${tender_status}' == 'Період уточнень'  Input text  xpath=//*[@id="mForm:data:desc"]  ${new_description}
   Click Element              xpath=//*[@id="mForm:bSave"]
   Sleep  10
@@ -440,8 +437,8 @@ Set Multi Ids
   Sleep  2
   Input Text  xpath=//*[@id="mForm:data:amount"]  ${amount}
   Input Text  xpath=//*[@id="mForm:data:rName"]  Тестовий закупівельник
-  Input Text  xpath=//*[@id="mForm:data:rPhone"]  0630000000
-  Input Text  xpath=//*[@id="mForm:data:rMail"]  test_test@test.com
+  Input Text  xpath=//*[@id="mForm:data:rPhone"]  ${telephone}
+  Input Text  xpath=//*[@id="mForm:data:rMail"]  ${mail}
   Click Element  xpath=//*[text()='Зберегти']
   Sleep  2
   Click Element  xpath=//*[text()='Зареєструвати пропозицію']
