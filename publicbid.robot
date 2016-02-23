@@ -19,8 +19,8 @@ ${telephone}     +380630000000
   Run Keyword If   '${ARGUMENTS[0]}' != 'Publicbid_Viewer'   Вхід
 
 Вхід
-  Run Keyword And Ignore Error   Wait Until Page Contains Element    xpath=//*[@id="mForm:j_idt30"]/tbody/tr[2]/td[7]/a   10
-  Click Element                      xpath=//*[@id="mForm:j_idt30"]/tbody/tr[2]/td[7]/a
+  Run Keyword And Ignore Error   Wait Until Page Contains Element    xpath=//*[text()='Реєстрація/Вхід']   10
+  Click Element                      xpath=//*[text()='Реєстрація/Вхід']
   Run Keyword And Ignore Error   Wait Until Page Contains Element   id=mForm:email   10
   Input text   id=mForm:email      ${USERS.users['${username}'].login}
   Sleep  2
@@ -62,8 +62,8 @@ ${telephone}     +380630000000
   ${name}=      Get From Dictionary   ${prepared_tender_data.procuringEntity.contactPoint}       name
 
   Selenium2Library.Switch Browser     ${ARGUMENTS[0]}
-  Wait Until Page Contains Element    xpath=//*[contains(@class, 'ui-button-text ui-c')][./text()='Нова закупівля']   10
-  Click Element                       xpath=//*[contains(@class, 'ui-button-text ui-c')][./text()='Нова закупівля']
+  Wait Until Page Contains Element    xpath=//*[text()='Нова закупівля']   10
+  Click Element                       xpath=//*[text()='Нова закупівля']
   Wait Until Page Contains Element    id=mForm:data:name
   Input text                          id=mForm:data:name     ${title}
   Input text                          id=mForm:data:desc     ${description}
