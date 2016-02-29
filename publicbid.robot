@@ -199,10 +199,15 @@ Set Multi Ids
   sleep  3
   Input Text   xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input  ${ARGUMENTS[1]}
   Press Key  xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input  \\13
-  Sleep  30
-#  ${last_note_id}=  Add pointy note   xpath=//*[@id="mForm:datalist_data"]/tr[1]/td[2]/a   Found tender with tenderID "${ARGUMENTS[1]}"   width=200  position=bottom
-#  sleep  1
-#  Remove element   ${last_note_id}
+  Sleep  10
+  :FOR    ${INDEX}    IN RANGE    1    30
+  \  ${find}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[text()='${ARGUMENTS[1]}']
+  \  Exit For Loop If  '${find}' == 'True'
+  \  Sleep  10
+  \  Clear Element Text  xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input
+  \  Input Text   xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input  ${ARGUMENTS[1]}
+  \  Press Key  xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input  \\13
+  \  Sleep  5
   Click Element    xpath=//*[text()='${ARGUMENTS[1]}']
   Wait Until Page Contains    ${ARGUMENTS[1]}   10
   sleep  1
