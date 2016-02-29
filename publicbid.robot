@@ -18,6 +18,7 @@ ${telephone}     +380630000000
   Set Window Position   @{USERS.users['${ARGUMENTS[0]}'].position}
   Run Keyword If   '${ARGUMENTS[0]}' != 'Publicbid_Viewer'   Вхід
 
+
 Вхід
   Run Keyword And Ignore Error   Wait Until Page Contains Element    xpath=//*[text()='Реєстрація/Вхід']   10
   Click Element                      xpath=//*[text()='Реєстрація/Вхід']
