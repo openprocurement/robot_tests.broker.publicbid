@@ -210,7 +210,7 @@ Set Multi Ids
   \  Sleep  5
   Click Element    xpath=//*[text()='${ARGUMENTS[1]}']
   Wait Until Page Contains    ${ARGUMENTS[1]}   10
-  sleep  1
+  Sleep  3
   Capture Page Screenshot
 
 Отримати інформацію із тендера
@@ -510,6 +510,20 @@ Set Multi Ids
   Input Text  xpath=//*[@id="mForm:messQ"]  ${answer}
   Click Element                      xpath=//*[@id="mForm:btnR"]
   Sleep  4
+
+Отримати посилання на аукціон для глядача
+  [Arguments]  ${username}  ${tender_uaid}
+  [Documentation]
+  ...   ${username} === username
+  ...   ${tender_uaid} == tender_uaid
+
+  Selenium2Library.Switch Browser    ${username}
+  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  Page Should Contain Element  xpath=//*[text()='Перегляд аукціону']
+  Click Element  xpath=//*[text()='Перегляд аукціону']
+  Sleep  3
+  ${url}=  Get Location
+  Log  ${url}
 
 
 
