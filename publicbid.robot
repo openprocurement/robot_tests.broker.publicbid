@@ -95,7 +95,7 @@ ${telephone}     +380630000000
   Input text                          id=mForm:data:rName    ${name}
   Input text                          id=mForm:data:rPhone    ${telephone}
   Input text                          id=mForm:data:rMail   ${mail}
-  Choose File                         id=mForm:data:docFile_input     ${file_path}
+  Завантажити документ  ${file_path}
   Sleep  2
   Run Keyword if   '${mode}' == 'multi'   Додати предмет   items
   # Save
@@ -124,6 +124,20 @@ ${telephone}     +380630000000
   ${Ids}       Convert To String  ${tender_UAid}
   Run keyword if   '${mode}' == 'multi'   Set Multi Ids   ${tender_UAid}
   [return]  ${Ids}
+
+Завантажити документ
+  [Arguments]   ${file}
+  Log  ${file}
+  Choose File       id=mForm:data:docFile_input     ${file_path}
+  Sleep  2
+  Capture Screenshot
+  Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
+  Click Element  id=mForm:docCard:dcType_label
+  Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
+  Click Element  xpath=//*[@id="mForm:docCard:dcType_panel"]/div/ul/li[2]
+  Click Element  xpath=//*[text()='Зберегти']
+  Sleep  2
+
 
 Set Multi Ids
   [Arguments]  @{ARGUMENTS}
