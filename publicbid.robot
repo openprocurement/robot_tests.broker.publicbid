@@ -94,7 +94,7 @@ ${telephone}     +380630000000
   Input text                          id=mForm:data:rName    ${name}
   Input text                          id=mForm:data:rPhone    ${telephone}
   Input text                          id=mForm:data:rMail   ${mail}
-  Завантажити документ  ${file_path}
+  publicbid.Завантажити документ  ${file_path}
   Sleep  2
   Run Keyword if   '${mode}' == 'multi'   Додати предмет   items
   # Save
@@ -129,12 +129,12 @@ ${telephone}     +380630000000
   Log  ${file}
   Choose File       id=mForm:data:docFile_input     ${file_path}
   Sleep  2
-  Capture Screenshot
+  Selenium2Library.Capture Page Screenshot
   Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
   Click Element  id=mForm:docCard:dcType_label
   Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
   Click Element  xpath=//*[@id="mForm:docCard:dcType_panel"]/div/ul/li[2]
-  Click Element  xpath=//*[text()='Зберегти']
+  Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
   Sleep  2
 
 
@@ -210,7 +210,7 @@ Set Multi Ids
   Wait Until Page Contains   Офіційний майданчик державних закупівель України   10
   sleep  1
   Click Element  xpath=//a[./text()="Закупівлі"]
-  sleep  3
+  sleep  5
   Input Text   xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input  ${ARGUMENTS[1]}
   Press Key  xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input  \\13
   Sleep  10
