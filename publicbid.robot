@@ -94,7 +94,7 @@ ${telephone}     +380630000000
   Input text                          id=mForm:data:rName    ${name}
   Input text                          id=mForm:data:rPhone    ${telephone}
   Input text                          id=mForm:data:rMail   ${mail}
-  Choose File                         id=mForm:data:docFile_input     ${file_path}
+  Завантажити документ до тендеру  ${file_path}
   Sleep  2
   Run Keyword if   '${mode}' == 'multi'   Додати предмет   items
   # Save
@@ -123,6 +123,30 @@ ${telephone}     +380630000000
   ${Ids}       Convert To String  ${tender_UAid}
   Run keyword if   '${mode}' == 'multi'   Set Multi Ids   ${tender_UAid}
   [return]  ${Ids}
+
+Завантажити документ до тендеру
+  [Arguments]   ${file}
+  Log  ${file}
+  Choose File       id=mForm:data:docFile_input     ${file_path}
+  Sleep  2
+  Selenium2Library.Capture Page Screenshot
+  Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
+  Click Element  id=mForm:docCard:dcType_label
+  Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
+  Click Element  xpath=//*[@id="mForm:docCard:dcType_panel"]/div/ul/li[2]
+  Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
+  Sleep  2
+
+Завантажити документ
+  [Arguments]   ${username}  ${file}  ${tender_uaid}
+  Log  ${username}
+  Log  ${file}
+  Log  ${tender_uaid}
+  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  Завантажити документ до тендеру  ${file}
+  Input text  id=mForm:data:docAdjust     Test text
+  Click Element  xpath=//*[@id="mForm:bSave"]
+
 
 Set Multi Ids
   [Arguments]  @{ARGUMENTS}
@@ -196,16 +220,21 @@ Set Multi Ids
   Wait Until Page Contains   Офіційний майданчик державних закупівель України   10
   sleep  1
   Click Element  xpath=//a[./text()="Закупівлі"]
-  sleep  3
+  sleep  5
   Input Text   xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input  ${ARGUMENTS[1]}
   Press Key  xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input  \\13
-  Sleep  30
-#  ${last_note_id}=  Add pointy note   xpath=//*[@id="mForm:datalist_data"]/tr[1]/td[2]/a   Found tender with tenderID "${ARGUMENTS[1]}"   width=200  position=bottom
-#  sleep  1
-#  Remove element   ${last_note_id}
+  Sleep  10
+  :FOR    ${INDEX}    IN RANGE    1    30
+  \  ${find}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[text()='${ARGUMENTS[1]}']
+  \  Exit For Loop If  '${find}' == 'True'
+  \  Sleep  10
+  \  Clear Element Text  xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input
+  \  Input Text   xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input  ${ARGUMENTS[1]}
+  \  Press Key  xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input  \\13
+  \  Sleep  5
   Click Element    xpath=//*[text()='${ARGUMENTS[1]}']
   Wait Until Page Contains    ${ARGUMENTS[1]}   10
-  sleep  1
+  Sleep  3
   Capture Page Screenshot
 
 Отримати інформацію із тендера
@@ -505,6 +534,20 @@ Set Multi Ids
   Input Text  xpath=//*[@id="mForm:messQ"]  ${answer}
   Click Element                      xpath=//*[@id="mForm:btnR"]
   Sleep  4
+
+Отримати посилання на аукціон для глядача
+  [Arguments]  ${username}  ${tender_uaid}
+  [Documentation]
+  ...   ${username} === username
+  ...   ${tender_uaid} == tender_uaid
+
+  Selenium2Library.Switch Browser    ${username}
+  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  Page Should Contain Element  xpath=//*[text()='Перегляд аукціону']
+  Click Element  xpath=//*[text()='Перегляд аукціону']
+  Sleep  3
+  ${url}=  Get Location
+  Log  ${url}
 
 
 
