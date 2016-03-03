@@ -94,7 +94,7 @@ ${telephone}     +380630000000
   Input text                          id=mForm:data:rName    ${name}
   Input text                          id=mForm:data:rPhone    ${telephone}
   Input text                          id=mForm:data:rMail   ${mail}
-  publicbid.Завантажити документ  ${file_path}
+  Завантажити документ до тендеру  ${file_path}
   Sleep  2
   Run Keyword if   '${mode}' == 'multi'   Додати предмет   items
   # Save
@@ -124,7 +124,7 @@ ${telephone}     +380630000000
   Run keyword if   '${mode}' == 'multi'   Set Multi Ids   ${tender_UAid}
   [return]  ${Ids}
 
-Завантажити документ
+Завантажити документ до тендеру
   [Arguments]   ${file}
   Log  ${file}
   Choose File       id=mForm:data:docFile_input     ${file_path}
@@ -136,6 +136,14 @@ ${telephone}     +380630000000
   Click Element  xpath=//*[@id="mForm:docCard:dcType_panel"]/div/ul/li[2]
   Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
   Sleep  2
+
+Завантажити документ
+  [Arguments]   ${username}  ${file}  ${tender_uaid}
+  Log  ${username}
+  Log  ${file}
+  Log  ${tender_uaid}
+  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  Завантажити документ до тендеру  ${file}
 
 
 Set Multi Ids
