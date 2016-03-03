@@ -144,6 +144,8 @@ ${telephone}     +380630000000
   Log  ${tender_uaid}
   publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
   Завантажити документ до тендеру  ${file}
+  Input text  id=mForm:data:docAdjust     Test text
+  Click Element  xpath=//*[@id="mForm:bSave"]
 
 
 Set Multi Ids
