@@ -13,12 +13,13 @@ ${telephone}     +380630000000
   [Arguments]  @{ARGUMENTS}
   [Documentation]  Відкрити браузер, створити об’єкт api wrapper, тощо
   ...      ${ARGUMENTS[0]} ==  username
-  Open Browser   ${USERS.users['${ARGUMENTS[0]}'].homepage}   ${USERS.users['${username}'].browser}   alias=${ARGUMENTS[0]}
+  Open Browser   ${USERS.users['${ARGUMENTS[0]}'].homepage}   ${USERS.users['${ARGUMENTS[0]}'].browser}   alias=${ARGUMENTS[0]}
   Set Window Size   @{USERS.users['${ARGUMENTS[0]}'].size}
   Set Window Position   @{USERS.users['${ARGUMENTS[0]}'].position}
-  Run Keyword If   '${ARGUMENTS[0]}' != 'Publicbid_Viewer'   Вхід
+  Run Keyword If   '${ARGUMENTS[0]}' != 'Publicbid_Viewer'   Вхід  ${ARGUMENTS[0]}
 
 Вхід
+  [Arguments]  ${username}
   Run Keyword And Ignore Error   Wait Until Page Contains Element    xpath=//*[text()='Реєстрація/Вхід']   10
   Click Element                      xpath=//*[text()='Реєстрація/Вхід']
   Run Keyword And Ignore Error   Wait Until Page Contains Element   id=mForm:email   10
@@ -127,7 +128,7 @@ ${telephone}     +380630000000
 Завантажити документ до тендеру
   [Arguments]   ${file}
   Log  ${file}
-  Choose File       id=mForm:data:docFile_input     ${file_path}
+  Choose File       id=mForm:data:docFile_input     ${file}
   Sleep  2
   Selenium2Library.Capture Page Screenshot
   Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
