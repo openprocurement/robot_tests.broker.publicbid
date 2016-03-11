@@ -244,6 +244,7 @@ Set Multi Ids
   ...      ${ARGUMENTS[0]} ==  username
   ...      ${ARGUMENTS[1]} ==  fieldname
   Switch browser   ${ARGUMENTS[0]}
+  Capture Page Screenshot
   Run Keyword And Return  Отримати інформацію про ${ARGUMENTS[1]}
 
 Отримати інформацію про title
