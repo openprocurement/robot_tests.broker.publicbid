@@ -100,7 +100,9 @@ ${telephone}     +380630000000
   Run Keyword if   '${mode}' == 'multi'   Додати предмет   items
   # Save
   Click Element                       xpath=//*[@id="mForm:bSave"]
-  Sleep   20
+  Sleep  10
+  Click Element  xpath=//*[@id="mForm:infoBar"]/div[3]/button[1]
+  Sleep  10
   # Announce
   Click Element                       xpath=//span[text()="Оголосити"]
   Sleep   2
@@ -459,7 +461,6 @@ Set Multi Ids
   ...      ${ARGUMENTS[0]} ==  username
   ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
   ...      ${ARGUMENTS[2]} ==  ${test_bid_data}
-  Sleep  200
   ${amount}=        Get From Dictionary   ${ARGUMENTS[2].data.value}         amount
   publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   ${tender_status}=  Get Text  xpath=//*[@id="mForm:data:status"]
@@ -471,7 +472,9 @@ Set Multi Ids
   Input Text  xpath=//*[@id="mForm:data:rPhone"]  ${telephone}
   Input Text  xpath=//*[@id="mForm:data:rMail"]  ${mail}
   Click Element  xpath=//*[text()='Зберегти']
-  Sleep  2
+  Sleep  5
+  Click Element  xpath=//*[@id="mForm:infoBar"]/div[3]/button[1]
+  Sleep  5
   Click Element  xpath=//*[text()='Зареєструвати пропозицію']
   ${status}=  Run Keyword And Return Status  Page Should Not Contain Element  xpath=//*[text()='Так']
   Run Keyword If  '${status}' == 'True'  Click Element  xpath=//*[text()='Так']
@@ -531,7 +534,7 @@ Set Multi Ids
   Run Keyword If  '${tender_status}' != 'Період уточнень'  Fail  "Період уточнень закінчився"
   Click Element                      xpath=//span[./text()='Обговорення']
   Sleep  3
-  Click Element                      xpath=//*[@id="mForm:data_data"]/tr[1]/td[3]/button
+  Click Element                      xpath=//*[@id="mForm:data_data"]/tr[1]/td[4]/button
   Input Text  xpath=//*[@id="mForm:messT"]  "Test answer"
   Input Text  xpath=//*[@id="mForm:messQ"]  ${answer}
   Click Element                      xpath=//*[@id="mForm:btnR"]
