@@ -40,3 +40,9 @@ def capitalize_first_letter(string):
 
 def to_int(value):
     return int(value)
+
+
+def trim_string(value):
+    value = value.rstrip()
+    value = value.lstrip()
+    return value

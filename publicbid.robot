@@ -7,6 +7,7 @@ Library  publicbid_service.py
 *** Variables ***
 ${mail}          test_test@test.com
 ${telephone}     +380630000000
+${bid_number}
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
@@ -358,13 +359,11 @@ Set Multi Ids
 
 Отримати інформацію про items[0].deliveryLocation.latitude
   ${return_value}=  Get Value           xpath=//*[@id="mForm:data:bidItem_0:delLoc1"]
-  ${return_value}=  Convert To Number  ${return_value}
-  [return]  ${return_value}
+  [return]  Convert To Number  ${return_value}
 
 Отримати інформацію про items[0].deliveryLocation.longitude
   ${return_value}=  Get Value           xpath=//*[@id="mForm:data:bidItem_0:delLoc2"]
-  ${return_value}=  Convert To Number  ${return_value}
-  [return]  ${return_value}
+  [return]  Convert To Number  ${return_value}
 
 Отримати інформацію про items[0].deliveryAddress.countryName
   ${return_value}=  Get Text           xpath=//*[@id="mForm:data:bidItem_0:nState"]
@@ -413,6 +412,7 @@ Set Multi Ids
 
 Отримати інформацію про items[0].additionalClassifications[0].description
   ${return_value}=  Get Text           xpath=//*[@id="mForm:data:bidItem_0:nDkpp"]
+  ${return_value}=  trim_string  ${return_value}
   [return]  ${return_value}
 
 Отримати інформацію про items[0].unit.name
@@ -500,11 +500,10 @@ Set Multi Ids
   Input Text  xpath=//*[@id="mForm:data:rPhone"]  ${telephone}
   Input Text  xpath=//*[@id="mForm:data:rMail"]  ${mail}
   Click Element  xpath=//*[text()='Зберегти']
-  Sleep  5
-
+  Sleep  3
+  Click Element  xpath=//*[@id="mForm:infoBar"]/div[3]/button/span[2]
+  Sleep  1
   Click Element  xpath=//*[text()='Зареєструвати пропозицію']
-  ${status}=  Run Keyword And Return Status  Page Should Not Contain Element  xpath=//*[text()='Так']
-  Run Keyword If  '${status}' == 'True'  Click Element  xpath=//*[text()='Так']
   Sleep  5
   ${status}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[@id="mForm:opt1"]
   Run Keyword If  '${status}' == 'True'  Click Element  xpath=//*[@id="mForm:opt1"]/div[2]/span
@@ -526,9 +525,8 @@ Set Multi Ids
   Selenium2Library.Capture Page Screenshot
   Click Element  xpath=//*[text()='Відмінити пропозицію']
   Selenium2Library.Capture Page Screenshot
-  Click Element  xpath=//*[text()='Так']
-  Selenium2Library.Capture Page Screenshot
-  Sleep  3
+  Click Element  xpath=//*[@class="ui-dialog-buttonpane ui-dialog-footer ui-widget-content ui-helper-clearfix"]/button/span[2]
+  Sleep  5
 
 
 Пошук цінової пропозиції
@@ -599,3 +597,7 @@ Set Multi Ids
 Змінити цінову пропозицію
   [Arguments]  @{ARGUMENTS}
   Log Many  @{ARGUMENTS}
+  Пошук цінової пропозиції
+  Input Text  xpath=//*[@id="mForm:data:amount"]  ${ARGUMENTS[3]}
+  Click Element  xpath=//*[text()='Зберегти']
+  Sleep  3
