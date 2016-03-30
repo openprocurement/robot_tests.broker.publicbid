@@ -31,3 +31,12 @@ def convert_item_date_to_string(date):
     date = date.strftime("%d.%m.%Y")
     return date
 
+
+def capitalize_first_letter(string):
+    string = string.lower()
+    string = string.capitalize()
+    return string
+
+
+def to_int(value):
+    return int(value)
