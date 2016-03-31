@@ -11,9 +11,11 @@ ${bid_number}
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
-  ${INITIAL_TENDER_DATA}=  prepare_test_tender_data
-  ${INITIAL_TENDER_DATA}=  Add_data_for_GUI_FrontEnds  ${INITIAL_TENDER_DATA}
-  [return]   ${INITIAL_TENDER_DATA}
+  [Arguments]  @{ARGUMENTS}
+  Log Many  @{ARGUMENTS}
+  ${ARGUMENTS[1]}=  change_data  ${ARGUMENTS[1]}
+  Log  ${ARGUMENTS[1]}
+  [return]  ${ARGUMENTS[1]}
 
 
 Підготувати клієнт для користувача
@@ -117,7 +119,7 @@ ${bid_number}
   Input text                          id=mForm:data:rName    ${name}
   Input text                          id=mForm:data:rPhone    ${telephone}
   Input text                          id=mForm:data:rMail   ${mail}
-  Input text                          id=mForm:data:stepPercent  2
+  Input text                          id=mForm:data:stepPercent  1
   Завантажити документ до тендеру  ${file_path}
   Sleep  2
   Run Keyword if   '${mode}' == 'multi'   Додати предмет   items
@@ -354,16 +356,15 @@ Set Multi Ids
 Отримати інформацію про items[0].deliveryDate.endDate
   ${return_value}=  Get Value           xpath=//*[@id="mForm:data:bidItem_0:delDE_input"]
   ${return_value}=  publicbid_service.parse_item_date  ${return_value}
-#  Fail  "На майданчику не вказуються години і хвилини"
   [return]  ${return_value}
 
 Отримати інформацію про items[0].deliveryLocation.latitude
   ${return_value}=  Get Value           xpath=//*[@id="mForm:data:bidItem_0:delLoc1"]
-  [return]  Convert To Number  ${return_value}
+  Run Keyword And Return  Convert To Number  ${return_value}
 
 Отримати інформацію про items[0].deliveryLocation.longitude
   ${return_value}=  Get Value           xpath=//*[@id="mForm:data:bidItem_0:delLoc2"]
-  [return]  Convert To Number  ${return_value}
+  Run Keyword And Return  Convert To Number  ${return_value}
 
 Отримати інформацію про items[0].deliveryAddress.countryName
   ${return_value}=  Get Text           xpath=//*[@id="mForm:data:bidItem_0:nState"]
@@ -412,7 +413,7 @@ Set Multi Ids
 
 Отримати інформацію про items[0].additionalClassifications[0].description
   ${return_value}=  Get Text           xpath=//*[@id="mForm:data:bidItem_0:nDkpp"]
-  ${return_value}=  trim_string  ${return_value}
+  ${return_value}=  Strip String  ${return_value}
   [return]  ${return_value}
 
 Отримати інформацію про items[0].unit.name
