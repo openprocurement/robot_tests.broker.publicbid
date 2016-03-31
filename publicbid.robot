@@ -8,11 +8,14 @@ Library  publicbid_service.py
 ${mail}          test_test@test.com
 ${telephone}     +380630000000
 ${bid_number}
+${initial_tender_data}
+${bid_uaid}
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
   [Arguments]  @{ARGUMENTS}
   Log Many  @{ARGUMENTS}
+  ${initial_tender_data}=  Get From Dictionary  ${ARGUMENTS[1]}  data
   ${ARGUMENTS[1]}=  change_data  ${ARGUMENTS[1]}
   Log  ${ARGUMENTS[1]}
   [return]  ${ARGUMENTS[1]}
@@ -127,7 +130,7 @@ ${bid_number}
   Run Keyword if   '${mode}' == 'multi'   Додати предмет   items
   # Save
   Click Element                       xpath=//*[@id="mForm:bSave"]
-  Sleep  5
+  Sleep  10
   Click Element                       xpath=//*[@id="mForm:infoBar"]/div[3]/button/span[2]
   Sleep   5
   # Announce
@@ -247,6 +250,7 @@ Set Multi Ids
   ...      ${ARGUMENTS[0]} ==  username
   ...      ${ARGUMENTS[1]} ==  tenderId
   ...      ${ARGUMENTS[2]} ==  id
+  ${bid_uaid}=  Convert To String  ${ARGUMENTS[1]}
   Switch browser   ${ARGUMENTS[0]}
   ${current_location}=   Get Location
   Wait Until Page Contains   Офіційний майданчик державних закупівель України   10
@@ -307,7 +311,7 @@ Set Multi Ids
 
 Отримати інформацію про procuringEntity.name
   ${return_value}=  Get Text           xpath=//*[@id="mForm:data:orgName"]
-  Fail  "Особливість реалізації, реєстрація організації проходить окремо від створення закупівлі, відображається інформація щодо вже зареєстрованих організацій"
+  ${return_value}=  Get From Dictionary  ${initial_tender_data.procuringEntity}  name
   [return]  ${return_value}
 
 Отримати інформацію про enquiryPeriod.startDate
@@ -526,9 +530,9 @@ Set Multi Ids
   Log Many  @{ARGUMENTS}
   Пошук цінової пропозиції  ${ARGUMENTS[0]}  ${ARGUMENTS[2]}
   Selenium2Library.Capture Page Screenshot
-  Click Element  xpath=//*[text()='Відмінити пропозицію']
+  Click Element  xpath=//*[@id="mForm:proposalCancelBtn"]
   Selenium2Library.Capture Page Screenshot
-  Click Element  id=mForm:proposalCancelBtnYes
+  Click Element  xpath=//*[@id="mForm:proposalCancelBtnYes"]
   Sleep  5
 
 
@@ -546,6 +550,9 @@ Set Multi Ids
   Sleep  3
   Selenium2Library.Capture Page Screenshot
   Click Element  xpath=//*[@id="mForm:propsRee_data"]/tr[1]/td[1]/div
+  Sleep  3
+  Click Element  xpath=//*[@id="mForm:propsRee:0:browseProposalDetailBtn"]
+  Sleep  7
 
 
 Відповісти на питання
@@ -602,7 +609,30 @@ Set Multi Ids
 Змінити цінову пропозицію
   [Arguments]  @{ARGUMENTS}
   Log Many  @{ARGUMENTS}
-  Пошук цінової пропозиції
+  Пошук цінової пропозиції  ${ARGUMENTS[0]}  ${ARGUMENTS[1]}
   Input Text  xpath=//*[@id="mForm:data:amount"]  ${ARGUMENTS[3]}
   Click Element  xpath=//*[text()='Зберегти']
   Sleep  3
+
+Завантажити документ в ставку
+  [Arguments]  @{ARGUMENTS}
+  Log Many  @{ARGUMENTS}
+  Choose File       id=mForm:data:tFile_input    ${ARGUMENTS[0]}
+  Sleep  3
+  Selenium2Library.Capture Page Screenshot
+  Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
+  Click Element  id=mForm:docCard:dcType_label
+  Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
+  Click Element  xpath=//*[@id="mForm:docCard:dcType_panel"]/div/ul/li[2]
+  Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
+  Sleep  4
+  Click Element  xpath=//*[text()='Зберегти']
+  ${return_value}=  Get Text  xpath=//*[@id="mForm:data:pnlFilesT"]/div/div/div/table/tbody/tr[1]/td[1]/span
+  [return]  ${return_value}
+
+Змінити документ в ставці
+  [Arguments]  @{ARGUMENTS}
+  Log Many  @{ARGUMENTS}
+  ${status}=  Run Keyword And Return Status  Page Should Contain Element  //*[@id="mForm:data:pnlFilesT"]/div/div/div/table/tbody/tr[1]/td[5]/button[1]
+  Run Keyword if   '${status}' == 'False'   Fail  "Закінчився період подачі пропозицій"
+
