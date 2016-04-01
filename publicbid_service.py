@@ -40,8 +40,6 @@ def capitalize_first_letter(string):
     return string
 
 
-def to_int(value):
-    return int(value)
 
 
 
