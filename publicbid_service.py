@@ -45,12 +45,5 @@ def to_int(value):
 
 
 def change_data(initial_data):
-    initial_data['data']['procuringEntity']['name'] = u"Тестова Закупівля"
-    initial_data['data']['items'][0]['deliveryAddress']['locality'] = u"м. Київ"
-    initial_data['data']['items'][0]['deliveryAddress']['region'] = u"м. Київ"
-    initial_data['data']['items'][0]['deliveryAddress']['countryName'] = u"Україна"
-    initial_data['data']['items'][0]['deliveryLocation']['latitude'] = u"49.85"
-    initial_data['data']['items'][0]['deliveryLocation']['longitude'] = u"24.0167"
-    initial_data['data']['items'][0]['unit']['name'] = u"кілограми"
     return initial_data
 
