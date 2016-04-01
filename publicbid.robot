@@ -8,16 +8,11 @@ Library  publicbid_service.py
 ${mail}          test_test@test.com
 ${telephone}     +380630000000
 ${bid_number}
-${initial_tender_data}
-${bid_uaid}
 
 *** Keywords ***
 Підготувати дані для оголошення тендера
   [Arguments]  @{ARGUMENTS}
   Log Many  @{ARGUMENTS}
-  ${initial_tender_data}=  Get From Dictionary  ${ARGUMENTS[1]}  data
-  ${ARGUMENTS[1]}=  change_data  ${ARGUMENTS[1]}
-  Log  ${ARGUMENTS[1]}
   [return]  ${ARGUMENTS[1]}
 
 
@@ -250,7 +245,6 @@ Set Multi Ids
   ...      ${ARGUMENTS[0]} ==  username
   ...      ${ARGUMENTS[1]} ==  tenderId
   ...      ${ARGUMENTS[2]} ==  id
-  ${bid_uaid}=  Convert To String  ${ARGUMENTS[1]}
   Switch browser   ${ARGUMENTS[0]}
   ${current_location}=   Get Location
   Wait Until Page Contains   Офіційний майданчик державних закупівель України   10

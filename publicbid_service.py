@@ -44,6 +44,4 @@ def to_int(value):
     return int(value)
 
 
-def change_data(initial_data):
-    return initial_data
 
