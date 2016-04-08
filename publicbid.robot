@@ -248,9 +248,9 @@ Set Multi Ids
   Switch browser   ${ARGUMENTS[0]}
   ${current_location}=   Get Location
   Wait Until Page Contains   Офіційний майданчик державних закупівель України   10
-  sleep  1
+  sleep  4
   Click Element  xpath=//a[./text()="Закупівлі"]
-  sleep  5
+  sleep  15
   Input Text   xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input  ${ARGUMENTS[1]}
   Press Key  xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input  \\13
   Sleep  10
@@ -264,7 +264,7 @@ Set Multi Ids
   \  Sleep  5
   Click Element    xpath=//*[text()='${ARGUMENTS[1]}']
   Wait Until Page Contains    ${ARGUMENTS[1]}   10
-  Sleep  3
+  Sleep  10
   Capture Page Screenshot
 
 Отримати інформацію із тендера
@@ -330,6 +330,7 @@ Set Multi Ids
 
 Отримати інформацію про minimalStep.amount
   ${return_value}=  Get Value           xpath=//*[@id="mForm:data:step"]
+  ${return_value}=  Convert To Number  ${return_value}
   [return]  ${return_value}
 
 Внести зміни в тендер
@@ -446,7 +447,7 @@ Set Multi Ids
   Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
   Sleep  5
   publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
-  Wait Until Page Contains Element   xpath=//*[@id="mForm:data:status"]   10
+  Wait Until Page Contains Element   xpath=//*[@id="mForm:data:status"]   20
   ${tender_status}=  Get Text  xpath=//*[@id="mForm:data:status"]
   Run Keyword If  '${tender_status}' != 'Період уточнень'  Fail  "Період уточнень закінчився"
   Click Element  xpath=//span[./text()='Обговорення']
@@ -550,15 +551,15 @@ Set Multi Ids
   Log Many  @{ARGUMENTS}
   Switch browser   ${ARGUMENTS[0]}
   Click Element  xpath=//*[text()='Мій кабінет']
-  Sleep  2
+  Sleep  5
   Selenium2Library.Capture Page Screenshot
   Click Element  xpath=//*[text()='Мої пропозиції']
-  Sleep  3
+  Sleep  5
   Selenium2Library.Capture Page Screenshot
   Click Element  xpath=//*[@id="mForm:propsRee_data"]/tr[1]/td[1]/div
-  Sleep  3
+  Sleep  5
   Click Element  xpath=//*[@id="mForm:propsRee:0:browseProposalDetailBtn"]
-  Sleep  7
+  Sleep  10
 
 
 Відповісти на питання
@@ -572,7 +573,7 @@ Set Multi Ids
   ${answer}=     Get From Dictionary  ${ARGUMENTS[3].data}  answer
 
   Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
-  Sleep  100
+  Sleep  5
   publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   Wait Until Page Contains Element   xpath=//*[@id="mForm:data:status"]   10
   ${tender_status}=  Get Text  xpath=//*[@id="mForm:data:status"]
@@ -590,7 +591,7 @@ Set Multi Ids
   [Documentation]
   ...   ${username} === username
   ...   ${tender_uaid} == tender_uaid
-  Sleep  100
+  Sleep  130
   Selenium2Library.Switch Browser    ${username}
   publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
   Page Should Contain Element  xpath=//*[text()='Перегляд аукціону']
@@ -603,9 +604,10 @@ Set Multi Ids
   [Documentation]
   ...   ${username} === username
   ...   ${tender_uaid} == tender_uaid
-  Sleep  100
+  Sleep  130
   Selenium2Library.Switch Browser    ${username}
   publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  Wait Until Page Contains Element    xpath=//*[text()='Перегляд аукціону']   60
   Page Should Contain Element  xpath=//*[text()='Перегляд аукціону']
   Sleep  3
   ${url}=  Get Element Attribute  mForm:data:auctionLink@href
