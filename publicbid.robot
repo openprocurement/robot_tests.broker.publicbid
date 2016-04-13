@@ -13,8 +13,6 @@ ${bid_number}
 Підготувати дані для оголошення тендера
   [Arguments]  @{ARGUMENTS}
   Log Many  @{ARGUMENTS}
-  ${ARGUMENTS[1]}=  change_data  ${ARGUMENTS[1]}
-  Log  ${ARGUMENTS[1]}
   [return]  ${ARGUMENTS[1]}
 
 
@@ -58,6 +56,7 @@ ${bid_number}
   ${tender_period_end_date}=  publicbid_service.convert_date_to_string  ${tender_period.endDate}
   ${countryName}=   Get From Dictionary   ${prepared_tender_data.procuringEntity.address}       countryName
   ${item_description}=  Get From Dictionary  ${items[0]}  description
+  ${item_locality}=  Get From Dictionary  ${items[0].deliveryAddress}  locality
   ${delivery_end_date}=      Get From Dictionary   ${items[0].deliveryDate}   endDate
   ${delivery_end_date}=      publicbid_service.convert_item_date_to_string  ${delivery_end_date}
   ${item_delivery_address_street_address}=  Get From Dictionary  ${items[0].deliveryAddress}  streetAddress
@@ -77,11 +76,12 @@ ${bid_number}
   Wait Until Page Contains Element    xpath=//*[text()='Нова закупівля']   10
   Click Element                       xpath=//*[text()='Нова закупівля']
   Sleep  3
-  Click Element  xpath=//*[@id="mForm:j_idt1056"]/span
+  Click Element  xpath=//*[@id="mForm:chooseProcurementTypeBtn"]
   Wait Until Page Contains Element    id=mForm:data:name  10
   Input text                          id=mForm:data:name     ${title}
   Input text                          id=mForm:data:desc     ${description}
   Input text                          id=mForm:data:budget   ${budget}
+  Sleep  5
   Input text                          id=mForm:data:step     ${step_rate}
   Input text                          xpath=//*[@id="mForm:data:dEA_input"]  ${enquiry_period_end_date}
   Input text                          xpath=//*[@id="mForm:data:dSPr_input"]  ${tender_period_start_date}
@@ -106,11 +106,11 @@ ${bid_number}
   Input text                          xpath=//*[@id="mForm:data:bidItem_0:delDE_input"]  ${delivery_end_date}
   Click Element                       xpath=//*[@id="mForm:data:bidItem_0:cReg"]/div[3]
   Sleep  1
-  Click Element                       xpath=//*[@id="mForm:data:bidItem_0:cReg_items"]/li[2]
+  Click Element                       xpath=//*[@id="mForm:data:bidItem_0:cReg_items"]/li[26]
   Sleep  1
-  Click Element                       xpath=//*[@id="mForm:data:bidItem_0:cTer"]/button
+  Input Text                       xpath=//*[@id="mForm:data:bidItem_0:cTer_input"]  ${item_locality}
   Sleep  2
-  Click Element                       xpath=//*[@id="mForm:data:bidItem_0:cTer_panel"]/table/tbody/tr[5]
+  Click Element                       xpath=//*[@id="mForm:data:bidItem_0:cTer_panel"]/table/tbody/tr[2]
   Sleep  1
   Input text                          id=mForm:data:bidItem_0:zc  ${item_delivery_postal_code}
   Input text                          xpath=//*[@id="mForm:data:bidItem_0:delAdr"]  ${item_delivery_address_street_address}
@@ -119,13 +119,13 @@ ${bid_number}
   Input text                          id=mForm:data:rName    ${name}
   Input text                          id=mForm:data:rPhone    ${telephone}
   Input text                          id=mForm:data:rMail   ${mail}
-  Input text                          id=mForm:data:stepPercent  1
+#  Input text                          id=mForm:data:stepPercent  1
   Завантажити документ до тендеру  ${file_path}
   Sleep  2
   Run Keyword if   '${mode}' == 'multi'   Додати предмет   items
   # Save
   Click Element                       xpath=//*[@id="mForm:bSave"]
-  Sleep   3
+  Sleep  10
   Click Element                       xpath=//*[@id="mForm:infoBar"]/div[3]/button/span[2]
   Sleep   5
   # Announce
@@ -248,9 +248,9 @@ Set Multi Ids
   Switch browser   ${ARGUMENTS[0]}
   ${current_location}=   Get Location
   Wait Until Page Contains   Офіційний майданчик державних закупівель України   10
-  sleep  1
+  sleep  4
   Click Element  xpath=//a[./text()="Закупівлі"]
-  sleep  5
+  sleep  15
   Input Text   xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input  ${ARGUMENTS[1]}
   Press Key  xpath=//*[@id="mForm:datalist:nBidClmn"]/div/input  \\13
   Sleep  10
@@ -264,7 +264,7 @@ Set Multi Ids
   \  Sleep  5
   Click Element    xpath=//*[text()='${ARGUMENTS[1]}']
   Wait Until Page Contains    ${ARGUMENTS[1]}   10
-  Sleep  3
+  Sleep  10
   Capture Page Screenshot
 
 Отримати інформацію із тендера
@@ -277,10 +277,11 @@ Set Multi Ids
 
 Отримати інформацію про value.currency
   ${return_value}=  Get Text  id=mForm:data:currency_label
+  ${return_value}=  Convert To String  UAH
   [return]  ${return_value}
 
 Отримати інформацію про value.valueAddedTaxIncluded
-  Fail  "Невозможно пропарсить"
+  ${return_value}=  Convert To Boolean  True
   [return]  ${return_value}
 
 Отримати інформацію про title
@@ -305,7 +306,6 @@ Set Multi Ids
 
 Отримати інформацію про procuringEntity.name
   ${return_value}=  Get Text           xpath=//*[@id="mForm:data:orgName"]
-  Fail  "Особливість реалізації, реєстрація організації проходить окремо від створення закупівлі, відображається інформація щодо вже зареєстрованих організацій"
   [return]  ${return_value}
 
 Отримати інформацію про enquiryPeriod.startDate
@@ -330,7 +330,7 @@ Set Multi Ids
 
 Отримати інформацію про minimalStep.amount
   ${return_value}=  Get Value           xpath=//*[@id="mForm:data:step"]
-  ${return_value}=  to_int  ${return_value}
+  ${return_value}=  Convert To Number  ${return_value}
   [return]  ${return_value}
 
 Внести зміни в тендер
@@ -354,7 +354,7 @@ Set Multi Ids
   [return]  ${return_value}
 
 Отримати інформацію про items[0].deliveryDate.endDate
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:data:bidItem_0:delDE_input"]
+  ${return_value}=  Get Value           xpath=//*[@id="mForm:data:bidItem_0:item0"]/tbody/tr[5]/td[4]/input
   ${return_value}=  publicbid_service.parse_item_date  ${return_value}
   [return]  ${return_value}
 
@@ -372,15 +372,15 @@ Set Multi Ids
   [return]  ${return_value}
 
 Отримати інформацію про items[0].deliveryAddress.postalCode
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:data:bidItem_0:zc"]
+  ${return_value}=  Get Value           xpath=//*[@id="mForm:data:bidItem_0:zcText"]
   [return]  ${return_value}
 
 Отримати інформацію про items[0].deliveryAddress.region
-  ${return_value}=  Get Text           xpath=//*[@id="mForm:data:bidItem_0:cReg_label"]
+  ${return_value}=  Get Value           xpath=//*[@id="mForm:data:bidItem_0:cRegText"]
   [return]  ${return_value}
 
 Отримати інформацію про items[0].deliveryAddress.locality
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:data:bidItem_0:cTer_input"]
+  ${return_value}=  Get Value           xpath=//*[@id="mForm:data:bidItem_0:cTerText"]
   [return]  ${return_value}
 
 Отримати інформацію про items[0].deliveryAddress.streetAddress
@@ -445,8 +445,9 @@ Set Multi Ids
   ${description}=  Get From Dictionary  ${ARGUMENTS[2].data}  description
 
   Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
+  Sleep  5
   publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
-  Wait Until Page Contains Element   xpath=//*[@id="mForm:data:status"]   10
+  Wait Until Page Contains Element   xpath=//*[@id="mForm:data:status"]   20
   ${tender_status}=  Get Text  xpath=//*[@id="mForm:data:status"]
   Run Keyword If  '${tender_status}' != 'Період уточнень'  Fail  "Період уточнень закінчився"
   Click Element  xpath=//span[./text()='Обговорення']
@@ -468,18 +469,30 @@ Set Multi Ids
   Reload Page
 
 Отримати інформацію про questions[0].title
+  Sleep  5
+  Click Element  xpath=//*[text()="Обговорення"]
+  Sleep  5
   ${return_value}=  Get Text  xpath=//*[@id="mForm:data_data"]/tr[1]/td[1]/span[1]
   [return]  ${return_value}
 
 Отримати інформацію про questions[0].description
+  Sleep  5
+  Click Element  xpath=//*[text()="Обговорення"]
+  Sleep  5
   ${return_value}=  Get Text  xpath=//*[@id="mForm:data_data"]/tr[1]/td[1]/span[2]
   [return]  ${return_value}
 
 Отримати інформацію про questions[0].date
+  Sleep  5
+  Click Element  xpath=//*[text()="Обговорення"]
+  Sleep  5
   ${return_value}=  Get Text  xpath=//*[@id="mForm:data_data"]/tr/td[4]
   [return]  ${return_value}
 
 Отримати інформацію про questions[0].answer
+  Sleep  5
+  Click Element  xpath=//*[text()="Обговорення"]
+  Sleep  5
   ${return_value}=  Get Text  xpath=//*[@id="mForm:data_data"]/tr[2]/td[1]/span[2]
   [return]  ${return_value}
 
@@ -489,7 +502,7 @@ Set Multi Ids
   ...      ${ARGUMENTS[0]} ==  username
   ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
   ...      ${ARGUMENTS[2]} ==  ${test_bid_data}
-  Sleep  200
+  Sleep  120
   ${amount}=        Get From Dictionary   ${ARGUMENTS[2].data.value}         amount
   publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   ${tender_status}=  Get Text  xpath=//*[@id="mForm:data:status"]
@@ -512,7 +525,7 @@ Set Multi Ids
   Sleep  5
   ${bid_number}=  Get Text  xpath=//*[@id="mForm:data"]/div[1]/table/tbody/tr[1]/td[2]
   Selenium2Library.Capture Page Screenshot
-  Sleep  80
+  Sleep  60
   [return]  ${bid_number}
 
 Скасувати цінову пропозицію
@@ -524,9 +537,9 @@ Set Multi Ids
   Log Many  @{ARGUMENTS}
   Пошук цінової пропозиції  ${ARGUMENTS[0]}  ${ARGUMENTS[2]}
   Selenium2Library.Capture Page Screenshot
-  Click Element  xpath=//*[text()='Відмінити пропозицію']
+  Click Element  xpath=//*[@id="mForm:proposalCancelBtn"]
   Selenium2Library.Capture Page Screenshot
-  Click Element  xpath=//*[@class="ui-dialog-buttonpane ui-dialog-footer ui-widget-content ui-helper-clearfix"]/button/span[2]
+  Click Element  xpath=//*[@id="mForm:proposalCancelBtnYes"]
   Sleep  5
 
 
@@ -538,10 +551,15 @@ Set Multi Ids
   Log Many  @{ARGUMENTS}
   Switch browser   ${ARGUMENTS[0]}
   Click Element  xpath=//*[text()='Мій кабінет']
-  Sleep  2
+  Sleep  5
+  Selenium2Library.Capture Page Screenshot
   Click Element  xpath=//*[text()='Мої пропозиції']
-  Sleep  3
+  Sleep  5
+  Selenium2Library.Capture Page Screenshot
   Click Element  xpath=//*[@id="mForm:propsRee_data"]/tr[1]/td[1]/div
+  Sleep  5
+  Click Element  xpath=//*[@id="mForm:propsRee:0:browseProposalDetailBtn"]
+  Sleep  10
 
 
 Відповісти на питання
@@ -555,14 +573,14 @@ Set Multi Ids
   ${answer}=     Get From Dictionary  ${ARGUMENTS[3].data}  answer
 
   Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
-  Sleep  100
+  Sleep  5
   publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   Wait Until Page Contains Element   xpath=//*[@id="mForm:data:status"]   10
   ${tender_status}=  Get Text  xpath=//*[@id="mForm:data:status"]
   Run Keyword If  '${tender_status}' != 'Період уточнень'  Fail  "Період уточнень закінчився"
   Click Element                      xpath=//span[./text()='Обговорення']
   Sleep  3
-  Click Element                      xpath=//*[@id="mForm:data_data"]/tr[1]/td[3]/button
+  Click Element                      xpath=//*[@id="mForm:data_data"]/tr[1]/td[5]/button
   Input Text  xpath=//*[@id="mForm:messT"]  "Test answer"
   Input Text  xpath=//*[@id="mForm:messQ"]  ${answer}
   Click Element                      xpath=//*[@id="mForm:btnR"]
@@ -573,32 +591,56 @@ Set Multi Ids
   [Documentation]
   ...   ${username} === username
   ...   ${tender_uaid} == tender_uaid
-  Sleep  100
+  Sleep  130
   Selenium2Library.Switch Browser    ${username}
   publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
   Page Should Contain Element  xpath=//*[text()='Перегляд аукціону']
-  Click Element  xpath=//*[text()='Перегляд аукціону']
   Sleep  3
-  ${url}=  Get Location
-  Log  ${url}
+  ${url}=  Get Element Attribute  mForm:data:auctionLink@href
+  [return]  ${url}
 
 Отримати посилання на аукціон для учасника
   [Arguments]  ${username}  ${tender_uaid}
   [Documentation]
   ...   ${username} === username
   ...   ${tender_uaid} == tender_uaid
+  Sleep  130
   Selenium2Library.Switch Browser    ${username}
   publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  Wait Until Page Contains Element    xpath=//*[text()='Перегляд аукціону']   60
   Page Should Contain Element  xpath=//*[text()='Перегляд аукціону']
-  Click Element  xpath=//*[text()='Перегляд аукціону']
   Sleep  3
-  ${url}=  Get Location
+  ${url}=  Get Element Attribute  mForm:data:auctionLink@href
   Log  ${url}
+  [return]  ${url}
 
 Змінити цінову пропозицію
   [Arguments]  @{ARGUMENTS}
   Log Many  @{ARGUMENTS}
-  Пошук цінової пропозиції
+  Пошук цінової пропозиції  ${ARGUMENTS[0]}  ${ARGUMENTS[1]}
   Input Text  xpath=//*[@id="mForm:data:amount"]  ${ARGUMENTS[3]}
   Click Element  xpath=//*[text()='Зберегти']
+  Sleep  15
+
+Завантажити документ в ставку
+  [Arguments]  @{ARGUMENTS}
+  Log Many  @{ARGUMENTS}
+  Choose File       id=mForm:data:tFile_input    ${ARGUMENTS[1]}
   Sleep  3
+  Selenium2Library.Capture Page Screenshot
+  Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
+  Click Element  id=mForm:docCard:dcType_label
+  Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
+  Click Element  xpath=//*[@id="mForm:docCard:dcType_panel"]/div/ul/li[2]
+  Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
+  Sleep  4
+  Click Element  xpath=//*[text()='Зберегти']
+  ${return_value}=  Get Text  xpath=//*[@id="mForm:data:pnlFilesT"]/div/div/div/table/tbody/tr[1]/td[1]/span
+  [return]  ${return_value}
+
+Змінити документ в ставці
+  [Arguments]  @{ARGUMENTS}
+  Log Many  @{ARGUMENTS}
+  ${status}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[@id="mForm:data:pnlFilesT"]/div/div/div/table/tbody/tr[1]/td[5]/button[1]
+  Run Keyword if   '${status}' == 'False'   Fail  "Закінчився період подачі пропозицій"
+

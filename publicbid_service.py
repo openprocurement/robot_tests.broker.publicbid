@@ -40,14 +40,6 @@ def capitalize_first_letter(string):
     return string
 
 
-def to_int(value):
-    return int(value)
 
 
-def change_data(initial_data):
-    initial_data['data']['items'][0]['deliveryAddress']['locality'] = u"м.Київ"
-    initial_data['data']['items'][0]['deliveryAddress']['region'] = u"М.КИЇВ"
-    initial_data['data']['items'][0]['deliveryAddress']['countryName'] = u"УКРАЇНА"
-    initial_data['data']['items'][0]['unit']['name'] = u"кілограми"
-    return initial_data
 
