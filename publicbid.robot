@@ -2,6 +2,7 @@
 Library  Selenium2Screenshots
 Library  String
 Library  DateTime
+Library  publicbid_json_util.py
 Library  publicbid_service.py
 
 *** Variables ***
@@ -47,7 +48,7 @@ ${bid_number}
   ${items}=         Get From Dictionary   ${prepared_tender_data}               items
   ${title}=         Get From Dictionary   ${prepared_tender_data}               title
   ${description}=   Get From Dictionary   ${prepared_tender_data}               description
-  ${budget}=        Get From Dictionary   ${prepared_tender_data.value}         amount
+  ${budget}=        get_budget   ${prepared_tender_data}
   ${step_rate}=     Get From Dictionary   ${prepared_tender_data.minimalStep}   amount
   ${enquiry_period}=  Get From Dictionary  ${prepared_tender_data}  enquiryPeriod
   ${enquiry_period_end_date}=  publicbid_service.convert_date_to_string  ${enquiry_period.endDate}
