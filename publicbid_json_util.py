@@ -6,7 +6,7 @@ tenderCodes = {
 
 
 def get_tender_code(key):
-    return tenderCodes[u"".join(key).encode('utf-8')]
+    return tenderCodes[unicode(key).encode('utf-8')]
 
 
 def get_budget(data):

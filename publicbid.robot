@@ -1,7 +1,6 @@
 *** Settings ***
-Library  Selenium2Screenshots
+Library  Selenium2Library
 Library  String
-Library  DateTime
 Library  publicbid_json_util.py
 Library  publicbid_service.py
 
