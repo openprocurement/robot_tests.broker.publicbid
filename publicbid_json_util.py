@@ -11,7 +11,7 @@ def get_tender_code(key):
 
 def get_budget(data):
     amount = data['value']['amount']
-    return amount
+    return str(amount)
 
 
 def adapt_data(data):
