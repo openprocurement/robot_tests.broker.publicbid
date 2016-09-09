@@ -48,7 +48,7 @@ ${bid_number}
   ${title}=         Get From Dictionary   ${prepared_tender_data}               title
   ${description}=   Get From Dictionary   ${prepared_tender_data}               description
   ${budget}=        get_budget   ${prepared_tender_data}
-  ${step_rate}=     Get From Dictionary   ${prepared_tender_data.minimalStep}   amount
+  ${step_rate}=     get_step_rate  ${prepared_tender_data}
   ${enquiry_period}=  Get From Dictionary  ${prepared_tender_data}  enquiryPeriod
   ${enquiry_period_end_date}=  publicbid_service.convert_date_to_string  ${enquiry_period.endDate}
   ${tender_period}=  Get From Dictionary  ${prepared_tender_data}  tenderPeriod
