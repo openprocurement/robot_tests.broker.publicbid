@@ -603,7 +603,7 @@ Set Multi Ids
   [Arguments]  @{ARGUMENTS}
   Log Many  @{ARGUMENTS}
   Пошук цінової пропозиції  ${ARGUMENTS[0]}  ${ARGUMENTS[1]}
-  Input Text  xpath=//*[@id="mForm:amount"]  ${ARGUMENTS[3]}
+  Input Text  xpath=//*[@id="mForm:data:amount"]  ${ARGUMENTS[3]}
   Click Element  xpath=//*[text()='Зберегти']
   Sleep  5
 
@@ -631,6 +631,24 @@ Set Multi Ids
 Змінити документ в ставці
   [Arguments]  @{ARGUMENTS}
   Log Many  @{ARGUMENTS}
-  ${status}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[@id="mForm:pnlFilesT"]/div/div/div/table/tbody/tr[1]/td[5]/button[1]
-  Run Keyword if   '${status}' == 'False'   Fail  "Закінчився період подачі пропозицій"
+  Пошук цінової пропозиції  ${ARGUMENTS[0]}
+  Click Element  xpath=//*[@id="mForm:data:pnlFilesT"]/div/div/div/table/tbody/tr[1]/td[5]/button[2]
+  Sleep  1
+  Click Element  xpath=//div[contains(@class, "ui-confirm-dialog") and @aria-hidden="false"]//span[text()="Так"]
+  Sleep  1
+  Choose File       xpath=//input[@id="mForm:data:tFile_input"]    ${ARGUMENTS[1]}
+  Sleep  3
+  Selenium2Library.Capture Page Screenshot
+  Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
+  Click Element  id=mForm:docCard:dcType_label
+  Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
+  Click Element  xpath=//*[@id="mForm:docCard:dcType_1"]
+  Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
+  Sleep  4
+  Execute JavaScript  window.scrollTo(0,0)
+  Click Element  id=mForm:proposalSaveBtn
+  ${return_value}=  Get Text  xpath=//*[@id="mForm:data:pnlFilesT"]/div/div/div/table/tbody/tr[1]/td[1]/span
+  Click Element  id=mForm:data:nBid
+  Sleep  3
+  [return]  ${return_value}
 
