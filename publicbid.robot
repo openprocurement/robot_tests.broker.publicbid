@@ -61,8 +61,6 @@ ${bid_number}
   ${delivery_end_date}=      publicbid_service.convert_item_date_to_string  ${delivery_end_date}
   ${item_delivery_address_street_address}=  Get From Dictionary  ${items[0].deliveryAddress}  streetAddress
   ${item_delivery_postal_code}=  Get From Dictionary  ${items[0].deliveryAddress}  postalCode
-  ${latitude}=  Get From Dictionary  ${items[0].deliveryLocation}  latitude
-  ${longtitude}=  Get From Dictionary  ${items[0].deliveryLocation}  longitude
   ${cpv}=           Convert To String     "Картонки"
   ${cpv_id}=           Get From Dictionary   ${items[0].classification}         id
   ${cpv_id_1}=           Get Substring    ${cpv_id}   0   3
@@ -107,8 +105,6 @@ ${bid_number}
   Sleep  1
   Input text                          id=mForm:bidItem_0:zc  ${item_delivery_postal_code}
   Input text                          xpath=//*[@id="mForm:bidItem_0:delAdr"]  ${item_delivery_address_street_address}
-  Input text                          id=mForm:bidItem_0:delLoc1  ${latitude}
-  Input text                          id=mForm:bidItem_0:delLoc2  ${longtitude}
   Input text                          id=mForm:rName    ${name}
   Input text                          id=mForm:rPhone    ${telephone}
   Input text                          id=mForm:rMail   ${mail}
