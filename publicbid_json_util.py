@@ -22,6 +22,6 @@ def get_step_rate(data):
 def adapt_data(data):
     data['data']['procuringEntity']['name'] = 'TestOrg'
     data['data']['items'][0]['deliveryAddress']['region'] = u"м.Київ"
-    data['data']['items'][0]['deliveryAddress']['locality'] = u"Райони М. київ"
+    data['data']['items'][0]['deliveryAddress']['locality'] = u"Голосіївський"
     return data
 
