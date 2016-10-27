@@ -3,6 +3,7 @@ Library  Selenium2Library
 Library  String
 Library  publicbid_json_util.py
 Library  publicbid_service.py
+Library  op_robot_tests.tests_files.service_keywords
 
 *** Variables ***
 ${mail}          test_test@test.com
@@ -21,7 +22,9 @@ ${bid_number}
   [Arguments]  @{ARGUMENTS}
   [Documentation]  Відкрити браузер, створити об’єкт api wrapper, тощо
   ...      ${ARGUMENTS[0]} ==  username
-  Open Browser   ${USERS.users['${ARGUMENTS[0]}'].homepage}   ${USERS.users['${ARGUMENTS[0]}'].browser}   alias=${ARGUMENTS[0]}
+  Log  ${USERS.users['${ARGUMENTS[0]}'].homepage}
+  Log  ${USERS.users['${ARGUMENTS[0]}'].browser}
+  Open Browser  ${USERS.users['${ARGUMENTS[0]}'].homepage}  ${USERS.users['${ARGUMENTS[0]}'].browser}  alias=${ARGUMENTS[0]}
   Set Window Size   @{USERS.users['${ARGUMENTS[0]}'].size}
   Set Window Position   @{USERS.users['${ARGUMENTS[0]}'].position}
   Run Keyword If   '${ARGUMENTS[0]}' != 'Publicbid_Viewer'   Вхід  ${ARGUMENTS[0]}
@@ -68,7 +71,11 @@ ${bid_number}
   Click Element                       xpath=//*[text()='ОГОЛОСИТИ ЕЛЕКТРОННІ ТОРГИ']
   Wait Until Page Contains Element    id=mForm:procurementType_label  10
   Click Element                       id=mForm:procurementType_label
-  Click Element                       id=mForm:procurementType_0
+  ${procurement_type}=  get from dictionary  ${prepared_tender_data}  procurementMethodType
+  Log  ${procurement_type}
+  Run Keyword If  '${procurement_type}' == 'dgfFinancialAssets'  Click Element  id=mForm:procurementType_0
+  ...             ELSE  Click Element  id=mForm:procurementType_1
+  Sleep  3
   Click Element                       id=mForm:chooseProcurementTypeBtn
   Wait Until Page Contains Element    id=mForm:name  10
   Input text                          id=mForm:name     ${title}
@@ -76,7 +83,8 @@ ${bid_number}
   Input text                          id=mForm:budget   ${budget}
   Sleep  5
   Input text                          id=mForm:step     ${step_rate}
-  Input text                          id=mForm:guaranteeAmount  ${guarantee.amount}
+  ${guarantee_amount}=  Convert To String  ${guarantee.amount}
+  Input text                          id=mForm:guaranteeAmount  ${guarantee_amount}
   Click Element                       id=mForm:guaranteeCurrency_label
   Click Element                       id=mForm:guaranteeCurrency_1
   Input text                          xpath=//*[@id="mForm:dStart_input"]  ${auctionPeriod_start_date}
@@ -496,29 +504,47 @@ Set Multi Ids
   ...      ${ARGUMENTS[0]} ==  username
   ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
   ...      ${ARGUMENTS[2]} ==  ${test_bid_data}
-  ${amount}=        Get From Dictionary   ${ARGUMENTS[2].data.value}         amount
+  log many  @{ARGUMENTS}
+  ${amount}=  Get From Dictionary   ${ARGUMENTS[2].data.value}  amount
   publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   ${tender_status}=  Get Text  xpath=//*[@id="mForm:status"]
   Run Keyword If  '${tender_status}' == 'Період уточнень'  Fail  "Неможливо подати цінову пропозицію в період уточнень"
   Click Element  xpath=//*[text()='Подати пропозицію']
   Sleep  2
-  Input Text  xpath=//*[@id="mForm:data:amount"]  ${amount}
-  Input Text  xpath=//*[@id="mForm:data:rName"]  Тестовий закупівельник
-  Input Text  xpath=//*[@id="mForm:data:rPhone"]  ${telephone}
-  Input Text  xpath=//*[@id="mForm:data:rMail"]  ${mail}
+  ${amount}=  convert to string  ${amount}
+  Input Text  xpath=//*[@id="mForm:amount"]  ${amount}
+
+
+  ${financial_license_path}  ${file_title}  ${file_content}=  create_fake_doc
+  choose file  id=mForm:qFile_input  ${financial_license_path}
+  Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
+  Click Element  id=mForm:docCard:dcType_label
+  Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
+  Click Element  id=mForm:docCard:dcType_3
+  Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
+  Sleep  2
+  Input Text  xpath=//*[@id="mForm:rName"]  Тестовий закупівельник
+  Input Text  xpath=//*[@id="mForm:rPhone"]  ${telephone}
+  Input Text  xpath=//*[@id="mForm:rMail"]  ${mail}
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[text()='Зберегти']
-  Sleep  3
-  Click Element  xpath=//*[@id="mForm:proposalSaveInfo"]/div[3]/button/span[2]
+  Sleep  4
+  Click Element  xpath=//*[@id="mForm:proposalSaveInfo"]/div[3]/button
   Sleep  1
   Click Element  xpath=//*[text()='Зареєструвати пропозицію']
   Sleep  5
-  Click Element  xpath=//div[@id="mForm:cdPay"]//span[text()='Зареєструвати пропозицію']
-  Sleep  5
-  ${bid_number}=  Get Text  xpath=//*[@id="mForm:data"]/div[1]/table/tbody/tr[3]/td[2]
+  ${bid_number}=  Get Text  xpath=//*[@id="mForm:data"]/table/tbody/tr[3]/td[2]
   Selenium2Library.Capture Page Screenshot
-  Sleep  45
+  Sleep  60
   [return]  ${bid_number}
+
+Отримати інформацію із пропозиції
+  [Arguments]  @{ARGUMENTS}
+  log many  @{ARGUMENTS}
+  ${return_value}=  get value  id=mForm:amount
+  ${return_value}=  convert to number  ${return_value}
+  capture page screenshot
+  [Return]  ${return_value}
 
 Скасувати цінову пропозицію
   [Arguments]  @{ARGUMENTS}
@@ -550,10 +576,8 @@ Set Multi Ids
   Click Element  xpath=//*[text()='Мої пропозиції']
   Sleep  3
   Selenium2Library.Capture Page Screenshot
-  Click Element  xpath=//*[@id="mForm:propsRee_data"]/tr[1]/td[1]/div
-  Sleep  2
-  Click Element  xpath=//*[@id="mForm:propsRee:0:browseProposalDetailBtn"]
-  Sleep  4
+  Click Element  xpath=//*[@id="mForm:proposalList:0:asdasd"]/div[1]/div/span[1]/a
+  Sleep  5
 
 
 Відповісти на питання
@@ -608,7 +632,8 @@ Set Multi Ids
   [Arguments]  @{ARGUMENTS}
   Log Many  @{ARGUMENTS}
   Пошук цінової пропозиції  ${ARGUMENTS[0]}  ${ARGUMENTS[1]}
-  Input Text  xpath=//*[@id="mForm:data:amount"]  ${ARGUMENTS[3]}
+  ${new_amount}=  convert to string  ${ARGUMENTS[3]}
+  Input Text  xpath=//*[@id="mForm:amount"]  ${new_amount}
   Click Element  xpath=//*[text()='Зберегти']
   Sleep  5
 
@@ -617,7 +642,7 @@ Set Multi Ids
   Log Many  @{ARGUMENTS}
   Пошук цінової пропозиції  ${ARGUMENTS[0]}  ${ARGUMENTS[1]}
   Selenium2Library.Capture Page Screenshot
-  Choose File       xpath=//input[@id="mForm:data:tFile_input"]    ${ARGUMENTS[1]}
+  Choose File       xpath=//input[@id="mForm:qFile_input"]    ${ARGUMENTS[1]}
   Sleep  3
   Selenium2Library.Capture Page Screenshot
   Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
@@ -628,8 +653,7 @@ Set Multi Ids
   Sleep  4
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  id=mForm:proposalSaveBtn
-  ${return_value}=  Get Text  xpath=//*[@id="mForm:data:pnlFilesT"]/div/div/div/table/tbody/tr[1]/td[1]/span
-  Click Element  id=mForm:data:nBid
+  ${return_value}=  Get Text  xpath=//*[@id="mForm:pnlFilesQ"]/div/div/div/table/tbody/tr[1]/td[1]/a
   Sleep  3
   [return]  ${return_value}
 
@@ -637,11 +661,11 @@ Set Multi Ids
   [Arguments]  @{ARGUMENTS}
   Log Many  @{ARGUMENTS}
   Пошук цінової пропозиції  ${ARGUMENTS[0]}
-  Click Element  xpath=//*[@id="mForm:data:pnlFilesT"]/div/div/div/table/tbody/tr[1]/td[5]/button[2]
+  Click Element  xpath=//*[@id="mForm:pnlFilesQ""]/div/div/div/table/tbody/tr[1]/td[5]/button[2]
   Sleep  1
   Click Element  xpath=//div[contains(@class, "ui-confirm-dialog") and @aria-hidden="false"]//span[text()="Так"]
   Sleep  1
-  Choose File       xpath=//input[@id="mForm:data:tFile_input"]    ${ARGUMENTS[1]}
+  Choose File       xpath=//input[@id="mForm:qFile_input"]    ${ARGUMENTS[1]}
   Sleep  3
   Selenium2Library.Capture Page Screenshot
   Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
@@ -652,8 +676,7 @@ Set Multi Ids
   Sleep  4
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  id=mForm:proposalSaveBtn
-  ${return_value}=  Get Text  xpath=//*[@id="mForm:data:pnlFilesT"]/div/div/div/table/tbody/tr[1]/td[1]/span
-  Click Element  id=mForm:data:nBid
+  ${return_value}=  Get Text  xpath=//*[@id="mForm:pnlFilesQ"]/div/div/div/table/tbody/tr[1]/td[1]/a
   Sleep  3
   [return]  ${return_value}
 
