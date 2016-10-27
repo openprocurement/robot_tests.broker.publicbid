@@ -1,6 +1,7 @@
 *** Settings ***
 Library  Selenium2Library
 Library  String
+Library  DateTime
 Library  publicbid_json_util.py
 Library  publicbid_service.py
 Library  op_robot_tests.tests_files.service_keywords
@@ -154,6 +155,7 @@ ${bid_number}
   Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
   Click Element  xpath=//*[@id="mForm:docCard:dcType_1"]
   Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
+  Selenium2Library.Capture Page Screenshot
   Sleep  2
 
 Завантажити документ
@@ -498,6 +500,12 @@ Set Multi Ids
   ${return_value}=  Get Text  xpath=//*[@id="mForm:data_data"]/tr[2]/td[1]/span[2]
   [return]  ${return_value}
 
+Отримати інформацію про auctionPeriod.endDate
+  Capture Page Screenshot
+  ${return_value}=  Get Text  xpath=//*[@id="mForm:auctionEndDate"]
+  ${return_value}=  publicbid_service.parse date  ${return_value}
+  [Return]  ${return_value}
+
 Подати цінову пропозицію
   [Arguments]  @{ARGUMENTS}
   [Documentation]
@@ -513,8 +521,6 @@ Set Multi Ids
   Sleep  2
   ${amount}=  convert to string  ${amount}
   Input Text  xpath=//*[@id="mForm:amount"]  ${amount}
-
-
   ${financial_license_path}  ${file_title}  ${file_content}=  create_fake_doc
   choose file  id=mForm:qFile_input  ${financial_license_path}
   Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
@@ -528,9 +534,10 @@ Set Multi Ids
   Input Text  xpath=//*[@id="mForm:rMail"]  ${mail}
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[text()='Зберегти']
-  Sleep  4
+  Wait Until Page Contains Element  xpath=//*[@id="mForm:proposalSaveInfo"]/div[3]/button  10
+  Sleep  2
   Click Element  xpath=//*[@id="mForm:proposalSaveInfo"]/div[3]/button
-  Sleep  1
+  Sleep  2
   Click Element  xpath=//*[text()='Зареєструвати пропозицію']
   Sleep  5
   ${bid_number}=  Get Text  xpath=//*[@id="mForm:data"]/table/tbody/tr[3]/td[2]
@@ -543,7 +550,7 @@ Set Multi Ids
   log many  @{ARGUMENTS}
   ${return_value}=  get value  id=mForm:amount
   ${return_value}=  convert to number  ${return_value}
-  capture page screenshot
+  Capture Page Screenshot
   [Return]  ${return_value}
 
 Скасувати цінову пропозицію
@@ -605,12 +612,9 @@ Set Multi Ids
   Sleep  4
 
 Отримати посилання на аукціон для глядача
-  [Arguments]  ${username}  ${tender_uaid}
-  [Documentation]
-  ...   ${username} === username
-  ...   ${tender_uaid} == tender_uaid
-  Selenium2Library.Switch Browser    ${username}
-  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  [Arguments]  @{ARGUMENTS}
+  Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
+  publicbid.Пошук тендера по ідентифікатору  ${ARGUMENTS[0]}  ${ARGUMENTS[1]}
   Selenium2Library.Capture Page Screenshot
   Sleep  3
   ${url}=  Get Element Attribute  id=mForm:auctionLink@href
@@ -629,20 +633,18 @@ Set Multi Ids
   [return]  ${url}
 
 Змінити цінову пропозицію
-  [Arguments]  @{ARGUMENTS}
-  Log Many  @{ARGUMENTS}
-  Пошук цінової пропозиції  ${ARGUMENTS[0]}  ${ARGUMENTS[1]}
-  ${new_amount}=  convert to string  ${ARGUMENTS[3]}
+  [Arguments]  ${username}  ${bid_number}  ${field}  ${new_amount}
+  Пошук цінової пропозиції  ${username}  ${bid_number}
+  ${new_amount}=  convert to string  ${new_amount}
   Input Text  xpath=//*[@id="mForm:amount"]  ${new_amount}
   Click Element  xpath=//*[text()='Зберегти']
   Sleep  5
 
 Завантажити документ в ставку
-  [Arguments]  @{ARGUMENTS}
-  Log Many  @{ARGUMENTS}
-  Пошук цінової пропозиції  ${ARGUMENTS[0]}  ${ARGUMENTS[1]}
+  [Arguments]  ${username}  ${file_path}  ${bid_number}
+  Пошук цінової пропозиції  ${username}  ${bid_number}
   Selenium2Library.Capture Page Screenshot
-  Choose File       xpath=//input[@id="mForm:qFile_input"]    ${ARGUMENTS[1]}
+  Choose File       xpath=//input[@id="mForm:qFile_input"]    ${file_path}
   Sleep  3
   Selenium2Library.Capture Page Screenshot
   Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
@@ -680,3 +682,29 @@ Set Multi Ids
   Sleep  3
   [return]  ${return_value}
 
+Підтвердити підписання контракту
+  [Arguments]  @{ARGUMENTS}
+  log many  @{ARGUMENTS}
+  Click Element  xpath=//*[text()='Результати аукціону']
+  Wait Until Page Contains Element  xpath=//*[text()='Учасники аукціону']  10
+  Click Element  xpath=//*[text()='Учасники аукціону']
+  Sleep  3
+  Click Element  xpath=//*[text()='Оформити договір']
+  Wait Until Page Contains Element  xpath=//*[text()='Оцінка']  10
+  ${current_date}=  Get Current Date
+  ${current_date}=  publicbid_service.convert_date_to_string  ${current_date}
+  Input text  xpath=//*[@id="mForm:dc_input"]  ${current_date}
+  Input text  xpath=//*[@id="mForm:contractNumber"]  123456
+  Capture Page Screenshot
+
+
+Підтвердити постачальника
+  [Arguments]  @{ARGUMENTS}
+  log many  @{ARGUMENTS}
+  Sleep  120
+  Click Element  xpath=//*[text()='Результати аукціону']
+  Wait Until Page Contains Element  xpath=//*[text()='Учасники аукціону']  10
+  Click Element  xpath=//*[text()='Учасники аукціону']
+  Sleep  3
+  Click Element  xpath=//*[text()='Оцінити']
+  Capture Page Screenshot

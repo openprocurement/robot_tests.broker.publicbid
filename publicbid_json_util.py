@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 tenderCodes = {
     "Період аукціону": "active.auction",
-    "Очікування пропозицій": "active.tendering"
+    "Очікування пропозицій": "active.tendering",
+    "Кваліфікація переможця": "active.qualification"
 }
 
 
