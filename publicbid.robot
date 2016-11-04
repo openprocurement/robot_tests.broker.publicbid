@@ -769,6 +769,7 @@ Set Multi Ids
   Capture Page Screenshot
   Sleep  1
   Click Element  id=mForm:bRS
+  Sleep  3
   Capture Page Screenshot
 
 
