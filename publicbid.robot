@@ -722,9 +722,11 @@ Set Multi Ids
   Click Element  xpath=//*[text()='Результати аукціону']
   Wait Until Page Contains Element  xpath=//*[text()='Учасники аукціону']  10
   Click Element  xpath=//*[text()='Учасники аукціону']
+  Capture Page Screenshot
   Sleep  3
   Click Element  xpath=//*[text()='Оформити договір']
   Wait Until Page Contains Element  xpath=//*[text()='Оцінка']  10
+  Capture Page Screenshot
   ${current_date}=  Get Current Date
   ${current_date}=  publicbid_service.convert_date_to_string  ${current_date}
   ${financial_license_path}  ${file_title}  ${file_content}=  create_fake_doc
@@ -740,7 +742,9 @@ Set Multi Ids
   Input text  xpath=//*[@id="mForm:contractNumber"]  123456
   Click Element  id=mForm:bS
   Sleep  15
+  Capture Page Screenshot
   Click Element  id=mForm:bS2
+  Capture Page Screenshot
   Click Element  id=mForm:yes-btn
   Sleep  3
   Capture Page Screenshot
@@ -752,12 +756,17 @@ Set Multi Ids
   Sleep  120
   Click Element  xpath=//*[text()='Результати аукціону']
   Wait Until Page Contains Element  xpath=//*[text()='Учасники аукціону']  10
+  Capture Page Screenshot
   Click Element  xpath=//*[text()='Учасники аукціону']
+  Capture Page Screenshot
   Sleep  3
   Click Element  xpath=//*[text()='Оцінити']
+  Capture Page Screenshot
   Sleep  3
   Click Element  id=mForm:bW
+  Capture Page Screenshot
   Click Element  xpath=//*[@id="mForm:confirm-dialog"]/div[3]/button[1]
+  Capture Page Screenshot
   Sleep  1
   Click Element  id=mForm:bRS
   Capture Page Screenshot
