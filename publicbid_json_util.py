@@ -1,13 +1,4 @@
 # -*- coding: utf-8 -*-
-tenderCodes = {
-    "Період аукціону": "active.auction",
-    "Очікування пропозицій": "active.tendering",
-    "Кваліфікація переможця": "active.qualification"
-}
-
-
-def get_tender_code(key):
-    return tenderCodes[unicode(key).encode('utf-8')]
 
 
 def get_budget(data):

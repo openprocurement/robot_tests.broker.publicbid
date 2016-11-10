@@ -274,17 +274,18 @@ Set Multi Ids
   Switch browser   ${ARGUMENTS[0]}
   Click Element  xpath=//a[./text()="Електронні торги"]
   Sleep  2
-  Click Element  xpath=//*[@id="buttons"]/button[1]
-  Input Text   xpath=//*[@id="mForm:search-by-number-input"]  ${ARGUMENTS[1]}
-  Press Key  xpath=//*[@id="mForm:search-by-number-input"]  \\13
+  Click Element  xpath=//*[@id="buttons"]/button[4]
+  Wait Until Page Contains Element  id=mForm:search-by-number-input  3
+  Input Text   id=mForm:search-by-number-input  ${ARGUMENTS[1]}
+  Press Key  id=mForm:search-by-number-input  \\13
   Sleep  1
   :FOR    ${INDEX}    IN RANGE    1    30
   \  ${find}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[text()='${ARGUMENTS[1]}']
   \  Exit For Loop If  '${find}' == 'True'
   \  Sleep  10
-  \  Clear Element Text  xpath=//*[@id="mForm:search-by-number-input"]
-  \  Input Text   xpath=//*[@id="mForm:search-by-number-input"]  ${ARGUMENTS[1]}
-  \  Press Key  xpath=//*[@id="mForm:search-by-number-input"]  \\13
+  \  Clear Element Text  id=mForm:search-by-name-input
+  \  Input Text   id=mForm:search-by-name-input  ${ARGUMENTS[1]}
+  \  Press Key  id=mForm:search-by-name-input  \\13
   \  Sleep  5
   Click Element    xpath=//*[text()='${ARGUMENTS[1]}']
   Wait Until Page Contains    ${ARGUMENTS[1]}   10
@@ -587,13 +588,8 @@ Set Multi Ids
   [Return]  ${return_value}
 
 Скасувати цінову пропозицію
-  [Arguments]  @{ARGUMENTS}
-  [Documentation]
-  ...      ${ARGUMENTS[0]} ==  username
-  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
-  ...      ${ARGUMENTS[2]} ==  bid_number
-  Log Many  @{ARGUMENTS}
-  Пошук цінової пропозиції  ${ARGUMENTS[0]}  ${ARGUMENTS[2]}
+  [Arguments]  ${username}  ${tender_uaid}
+  Пошук цінової пропозиції  ${username}  ${tender_uaid}
   Selenium2Library.Capture Page Screenshot
   Click Element  xpath=//*[@id="mForm:proposalCancelBtn"]
   Selenium2Library.Capture Page Screenshot
@@ -603,9 +599,6 @@ Set Multi Ids
 
 Пошук цінової пропозиції
   [Arguments]  @{ARGUMENTS}
-  [Documentation]
-  ...      ${ARGUMENTS[0]} ==  username
-  ...      ${ARGUMENTS[1]} ==  bid_number
   Log Many  @{ARGUMENTS}
   Switch browser   ${ARGUMENTS[0]}
   Click Element  xpath=//div[contains(@class, 'cabinet-user-name')]
@@ -756,17 +749,12 @@ Set Multi Ids
   Sleep  120
   Click Element  xpath=//*[text()='Результати аукціону']
   Wait Until Page Contains Element  xpath=//*[text()='Учасники аукціону']  10
-  Capture Page Screenshot
   Click Element  xpath=//*[text()='Учасники аукціону']
-  Capture Page Screenshot
   Sleep  3
   Click Element  xpath=//*[text()='Оцінити']
-  Capture Page Screenshot
   Sleep  3
   Click Element  id=mForm:bW
-  Capture Page Screenshot
   Click Element  xpath=//*[@id="mForm:confirm-dialog"]/div[3]/button[1]
-  Capture Page Screenshot
   Sleep  1
   Click Element  id=mForm:bRS
   Sleep  3
@@ -779,3 +767,41 @@ Set Multi Ids
   Click Element  xpath=//span[./text()='Обговорення']
   ${question_element_id}=  Get Element Attribute  xpath=//span[starts-with(., '${question_id}')]@style
   Log  ${question_element_id}
+
+Скасувати закупівлю
+  [Arguments]  ${username}  ${tender_uaid}  ${cancellation_reason}  ${cancellation_file}  ${cancellation_description}
+  publicbid.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Click Element  id=mForm:tender-cancel-btn
+  Wait Until Page Contains Element  id=mForm:cReason  10
+  Input Text  id=mForm:cReason  ${cancellation_reason}
+  Choose File  id=mForm:docFile_input  ${cancellation_file}
+  Wait Until Page Contains Element  xpath=//*[text()="Картка документу"]  10
+  Input Text  xpath=//*[@id="mForm:docCard:docCard"]/table/tbody/tr[2]/td[2]/textarea  ${cancellation_description}
+  Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
+  Sleep  3
+  Click Element  id=mForm:cancellation-active-btn
+  Wait Until Page Contains Element  id=infoBar  30
+  Sleep  3
+
+Отримати інформацію про cancellations[0].status
+  Capture Page Screenshot
+  Reload Page
+  Click Element  id=mForm:cancellation-reason-lnk
+  Wait Until Page Contains Element  id=mForm:cStatus  10
+  ${return_value}=  Get Text  id=mForm:cStatus
+  ${return_value}=  get_cancellation_code  ${return_value}
+  ${return_value}=  Convert To String  ${return_value}
+  [Return]  ${return_value}
+
+Отримати інформацію про cancellations[0].reason
+  Capture Page Screenshot
+  ${return_value}=  Get Text  id=mForm:cReason
+  [Return]  ${return_value}
+
+Отримати інформацію із документа
+  [Arguments]  ${username}  ${tender_uaid}  ${document_id}  ${field}
+  Capture Page Screenshot
+  ${field_id}=  get_cancellation_field_id  ${field}
+  ${return_value}=  Get Text  id=${field_id}
+  ${return_value}=  Convert To String  ${return_value}
+  [Return]  ${return_value}
