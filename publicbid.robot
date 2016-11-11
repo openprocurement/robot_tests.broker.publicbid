@@ -73,7 +73,7 @@ ${bid_number}
   ${name}=      Get From Dictionary   ${prepared_tender_data.procuringEntity.contactPoint}       name
   ${dkpp_id}=  Convert To String  1.13
 
-  Selenium2Library.Switch Browser     ${ARGUMENTS[0]}
+  Switch Browser     ${ARGUMENTS[0]}
   Wait Until Page Contains Element    xpath=//*[text()='ОГОЛОСИТИ ЕЛЕКТРОННІ ТОРГИ']   10
   Click Element                       xpath=//*[text()='ОГОЛОСИТИ ЕЛЕКТРОННІ ТОРГИ']
   Wait Until Page Contains Element    id=mForm:procurementType_label  10
@@ -157,14 +157,14 @@ ${bid_number}
   Log  ${type}
   Choose File       id=mForm:docFile_input     ${file}
   Sleep  2
-  Selenium2Library.Capture Page Screenshot
+  Capture Page Screenshot
   Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
   Click Element  id=mForm:docCard:dcType_label
   Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
   Run Keyword If  '${type}' == 'img'  Click Element  xpath=//*[@id="mForm:docCard:dcType_1"]
   Run Keyword If  '${type}' == 'doc'  Click Element  xpath=//*[@id="mForm:docCard:dcType_14"]
   Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
-  Selenium2Library.Capture Page Screenshot
+  Capture Page Screenshot
   Sleep  5
 
 Завантажити документ
@@ -201,7 +201,7 @@ ${bid_number}
   Input Text  id=mForm:docCard:fileName  ${vdr_link}
   Input Text  id=mForm:docCard:extUrl  ${vdr_link}
   Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
-  Selenium2Library.Capture Page Screenshot
+  Capture Page Screenshot
   Sleep  5
 
 Set Multi Ids
@@ -274,17 +274,18 @@ Set Multi Ids
   Switch browser   ${ARGUMENTS[0]}
   Click Element  xpath=//a[./text()="Електронні торги"]
   Sleep  2
-  Click Element  xpath=//*[@id="buttons"]/button[1]
-  Input Text   xpath=//*[@id="mForm:search-by-number-input"]  ${ARGUMENTS[1]}
-  Press Key  xpath=//*[@id="mForm:search-by-number-input"]  \\13
+  Click Element  xpath=//*[@id="buttons"]/button[4]
+  Wait Until Page Contains Element  id=mForm:search-by-number-input  3
+  Input Text   id=mForm:search-by-number-input  ${ARGUMENTS[1]}
+  Press Key  id=mForm:search-by-number-input  \\13
   Sleep  1
   :FOR    ${INDEX}    IN RANGE    1    30
   \  ${find}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[text()='${ARGUMENTS[1]}']
   \  Exit For Loop If  '${find}' == 'True'
   \  Sleep  10
-  \  Clear Element Text  xpath=//*[@id="mForm:search-by-number-input"]
-  \  Input Text   xpath=//*[@id="mForm:search-by-number-input"]  ${ARGUMENTS[1]}
-  \  Press Key  xpath=//*[@id="mForm:search-by-number-input"]  \\13
+  \  Clear Element Text  id=mForm:search-by-name-input
+  \  Input Text   id=mForm:search-by-name-input  ${ARGUMENTS[1]}
+  \  Press Key  id=mForm:search-by-name-input  \\13
   \  Sleep  5
   Click Element    xpath=//*[text()='${ARGUMENTS[1]}']
   Wait Until Page Contains    ${ARGUMENTS[1]}   10
@@ -367,7 +368,7 @@ Set Multi Ids
 
 Внести зміни в тендер
   [Arguments]  ${username}  ${tender_uaid}  ${field}  ${value}
-  Selenium2Library.Switch Browser    ${username}
+  Switch Browser    ${username}
   publicbid.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Wait Until Page Contains Element   xpath=//*[@id="mForm:status"]   10
   ${field_id}=  publicbid_service.get_field_id  ${field}
@@ -492,7 +493,7 @@ Set Multi Ids
   ${title}=        Get From Dictionary  ${ARGUMENTS[2].data}  title
   ${description}=  Get From Dictionary  ${ARGUMENTS[2].data}  description
 
-  Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
+  Switch Browser    ${ARGUMENTS[0]}
   publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   Wait Until Page Contains Element   xpath=//*[@id="mForm:status"]   20
   ${tender_status}=  Get Text  xpath=//*[@id="mForm:status"]
@@ -509,7 +510,7 @@ Set Multi Ids
   [Documentation]
   ...      ${ARGUMENTS[0]} =  username
   ...      ${ARGUMENTS[1]} =  ${TENDER_UAID}
-  Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
+  Switch Browser    ${ARGUMENTS[0]}
   publicbid.Пошук тендера по ідентифікатору    ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
 
 Отримати інформацію про questions[0].title
@@ -574,7 +575,7 @@ Set Multi Ids
   Click Element  xpath=//*[text()='Зареєструвати пропозицію']
   Sleep  5
   ${bid_number}=  Get Text  xpath=//*[@id="mForm:data"]/table/tbody/tr[3]/td[2]
-  Selenium2Library.Capture Page Screenshot
+  Capture Page Screenshot
   Sleep  60
   [Return]  ${bid_number}
 
@@ -587,35 +588,27 @@ Set Multi Ids
   [Return]  ${return_value}
 
 Скасувати цінову пропозицію
-  [Arguments]  @{ARGUMENTS}
-  [Documentation]
-  ...      ${ARGUMENTS[0]} ==  username
-  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
-  ...      ${ARGUMENTS[2]} ==  bid_number
-  Log Many  @{ARGUMENTS}
-  Пошук цінової пропозиції  ${ARGUMENTS[0]}  ${ARGUMENTS[2]}
-  Selenium2Library.Capture Page Screenshot
+  [Arguments]  ${username}  ${tender_uaid}
+  Пошук цінової пропозиції  ${username}  ${tender_uaid}
+  Capture Page Screenshot
   Click Element  xpath=//*[@id="mForm:proposalCancelBtn"]
-  Selenium2Library.Capture Page Screenshot
+  Capture Page Screenshot
   Click Element  xpath=//*[@id="mForm:proposalCancelBtnYes"]
   Sleep  5
 
 
 Пошук цінової пропозиції
   [Arguments]  @{ARGUMENTS}
-  [Documentation]
-  ...      ${ARGUMENTS[0]} ==  username
-  ...      ${ARGUMENTS[1]} ==  bid_number
   Log Many  @{ARGUMENTS}
   Switch browser   ${ARGUMENTS[0]}
   Click Element  xpath=//div[contains(@class, 'cabinet-user-name')]
   Sleep  3
   Click Element  xpath=//*[@id="wrapper"]/div/span
-  Selenium2Library.Capture Page Screenshot
+  Capture Page Screenshot
   Sleep  2
   Click Element  xpath=//*[text()='Мої пропозиції']
   Sleep  3
-  Selenium2Library.Capture Page Screenshot
+  Capture Page Screenshot
   Click Element  xpath=//*[@id="mForm:proposalList:0:asdasd"]/div[1]/div/span[1]/a
   Sleep  5
 
@@ -630,7 +623,7 @@ Set Multi Ids
 
   ${answer}=     Get From Dictionary  ${ARGUMENTS[3].data}  answer
 
-  Selenium2Library.Switch Browser    ${ARGUMENTS[0]}
+  Switch Browser    ${ARGUMENTS[0]}
   Sleep  5
   publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   Wait Until Page Contains Element   xpath=//*[@id="mForm:status"]   10
@@ -646,9 +639,9 @@ Set Multi Ids
 
 Отримати посилання на аукціон для глядача
   [Arguments]  ${username}  ${bid_number}  @{ARGUMENTS}
-  Selenium2Library.Switch Browser    ${username}
+  Switch Browser    ${username}
   publicbid.Пошук тендера по ідентифікатору  ${username}  ${bid_number}
-  Selenium2Library.Capture Page Screenshot
+  Capture Page Screenshot
   Sleep  3
   ${url}=  Get Element Attribute  id=mForm:auctionLink@href
   [Return]  ${url}
@@ -658,9 +651,9 @@ Set Multi Ids
   [Documentation]
   ...   ${username} === username
   ...   ${tender_uaid} == tender_uaid
-  Selenium2Library.Switch Browser    ${username}
+  Switch Browser    ${username}
   publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-  Selenium2Library.Capture Page Screenshot
+  Capture Page Screenshot
   Sleep  3
   ${url}=  Get Element Attribute  id=mForm:participationLink@href
   [Return]  ${url}
@@ -676,10 +669,10 @@ Set Multi Ids
 Завантажити документ в ставку
   [Arguments]  ${username}  ${file_path}  ${bid_number}
   Пошук цінової пропозиції  ${username}  ${bid_number}
-  Selenium2Library.Capture Page Screenshot
+  Capture Page Screenshot
   Choose File       xpath=//input[@id="mForm:qFile_input"]    ${file_path}
   Sleep  3
-  Selenium2Library.Capture Page Screenshot
+  Capture Page Screenshot
   Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
   Click Element  id=mForm:docCard:dcType_label
   Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
@@ -702,7 +695,7 @@ Set Multi Ids
   Sleep  1
   Choose File       xpath=//input[@id="mForm:qFile_input"]    ${ARGUMENTS[1]}
   Sleep  3
-  Selenium2Library.Capture Page Screenshot
+  Capture Page Screenshot
   Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
   Click Element  id=mForm:docCard:dcType_label
   Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
@@ -756,17 +749,12 @@ Set Multi Ids
   Sleep  120
   Click Element  xpath=//*[text()='Результати аукціону']
   Wait Until Page Contains Element  xpath=//*[text()='Учасники аукціону']  10
-  Capture Page Screenshot
   Click Element  xpath=//*[text()='Учасники аукціону']
-  Capture Page Screenshot
   Sleep  3
   Click Element  xpath=//*[text()='Оцінити']
-  Capture Page Screenshot
   Sleep  3
   Click Element  id=mForm:bW
-  Capture Page Screenshot
   Click Element  xpath=//*[@id="mForm:confirm-dialog"]/div[3]/button[1]
-  Capture Page Screenshot
   Sleep  1
   Click Element  id=mForm:bRS
   Sleep  3
@@ -779,3 +767,41 @@ Set Multi Ids
   Click Element  xpath=//span[./text()='Обговорення']
   ${question_element_id}=  Get Element Attribute  xpath=//span[starts-with(., '${question_id}')]@style
   Log  ${question_element_id}
+
+Скасувати закупівлю
+  [Arguments]  ${username}  ${tender_uaid}  ${cancellation_reason}  ${cancellation_file}  ${cancellation_description}
+  publicbid.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Click Element  id=mForm:tender-cancel-btn
+  Wait Until Page Contains Element  id=mForm:cReason  10
+  Input Text  id=mForm:cReason  ${cancellation_reason}
+  Choose File  id=mForm:docFile_input  ${cancellation_file}
+  Wait Until Page Contains Element  xpath=//*[text()="Картка документу"]  10
+  Input Text  xpath=//*[@id="mForm:docCard:docCard"]/table/tbody/tr[2]/td[2]/textarea  ${cancellation_description}
+  Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
+  Sleep  3
+  Click Element  id=mForm:cancellation-active-btn
+  Wait Until Page Contains Element  id=infoBar  30
+  Sleep  3
+
+Отримати інформацію про cancellations[0].status
+  Capture Page Screenshot
+  Reload Page
+  Click Element  id=mForm:cancellation-reason-lnk
+  Wait Until Page Contains Element  id=mForm:cStatus  10
+  ${return_value}=  Get Text  id=mForm:cStatus
+  ${return_value}=  get_cancellation_code  ${return_value}
+  ${return_value}=  Convert To String  ${return_value}
+  [Return]  ${return_value}
+
+Отримати інформацію про cancellations[0].reason
+  Capture Page Screenshot
+  ${return_value}=  Get Text  id=mForm:cReason
+  [Return]  ${return_value}
+
+Отримати інформацію із документа
+  [Arguments]  ${username}  ${tender_uaid}  ${document_id}  ${field}
+  Capture Page Screenshot
+  ${field_id}=  get_cancellation_field_id  ${field}
+  ${return_value}=  Get Text  id=${field_id}
+  ${return_value}=  Convert To String  ${return_value}
+  [Return]  ${return_value}

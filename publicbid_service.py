@@ -6,6 +6,25 @@ import pytz
 
 TZ = pytz.timezone('Europe/Kiev')
 
+tenderCodes = {
+    "Період аукціону": "active.auction",
+    "Очікування пропозицій": "active.tendering",
+    "Кваліфікація переможця": "active.qualification",
+    "Аукціон не відбувся": "unsuccessful"
+}
+
+cancellationCodes = {
+    "Скасування активоване": "active"
+}
+
+
+def get_tender_code(key):
+    return tenderCodes[unicode(key).encode('utf-8')]
+
+
+def get_cancellation_code(key):
+    return cancellationCodes[unicode(key).encode('utf-8')]
+
 
 def parse_date(date_str):
     date_str = datetime.strptime(date_str, "%d.%m.%Y %H:%M")
@@ -59,6 +78,18 @@ def get_field_value(field_id, field_value):
     }
 
     return values[field_id]
+
+
+def get_cancellation_field_id(field_id):
+    values = {
+        'title': 'mForm:cancellation-docs:dg-data-table:0:dg-file-api-lnk',
+        'description': 'mForm:cancellation-docs:dg-data-table:0:dg-description-text'
+    }
+
+    return values[field_id]
+
+
+
 
 
 
