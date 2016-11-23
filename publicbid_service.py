@@ -17,6 +17,11 @@ cancellationCodes = {
     "Скасування активоване": "active"
 }
 
+proposalDocumentTypes = {
+    "Протокол аукціону": "auctionProtocol",
+    "Ліцензія": "license"
+}
+
 
 def get_tender_code(key):
     return tenderCodes[unicode(key).encode('utf-8')]
@@ -87,6 +92,10 @@ def get_cancellation_field_id(field_id):
     }
 
     return values[field_id]
+
+
+def get_proposal_document_type(key):
+    return proposalDocumentTypes[unicode(key).encode('utf-8')]
 
 
 

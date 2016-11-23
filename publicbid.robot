@@ -758,19 +758,19 @@ Set Multi Ids
   log  ${tender_uaid}
   log  ${index}
   Sleep  120
-  Click Element  xpath=//*[text()='Результати аукціону']
-  Wait Until Page Contains Element  xpath=//*[text()='Учасники аукціону']  10
-  Click Element  xpath=//*[text()='Учасники аукціону']
-  Wait Until Page Contains Element  xpath=//*[text()='Оцінити']  10
+  Click Element  id=mForm:auction-results-btn
+  Wait Until Page Contains Element  id=mForm:mForm:auctions-bidders-btn  10
+  Click Element  id=mForm:mForm:auctions-bidders-btn
+  Wait Until Page Contains Element  id=mForm:data:${index}:rate-btn  10
   capture page screenshot
-  Click Element  xpath=//*[text()='Оцінити']
-  Sleep  3
+  Click Element  id=mForm:data:${index}:rate-btn
+  Wait Until Page Contains Element  id=mForm:bW
   capture page screenshot
   Click Element  id=mForm:bW
   Click Element  xpath=//*[@id="mForm:confirm-dialog"]/div[3]/button[1]
-  Sleep  1
+  Sleep  2
   Click Element  id=mForm:bRS
-  Sleep  3
+  Sleep  10
   Capture Page Screenshot
 
 
@@ -881,13 +881,18 @@ Set Multi Ids
 
 Отримати кількість документів в ставці
   [Arguments]  ${username}  ${tebder_uaid}  ${index}
+  log  ${username}
+  log  ${tebder_uaid}
+  log  ${index}
   capture page screenshot
   click element  id=mForm:auction-results-btn
   wait until page contains element  id=mForm:mForm:auctions-bidders-btn  10
   click element  id=mForm:mForm:auctions-bidders-btn
-  log  ${username}
-  log  ${tebder_uaid}
-  log  ${index}
+  wait until page contains element  id=mForm:data:${index}:rate-btn  10
+  click element  id=mForm:data:${index}:rate-btn
+  wait until page contains element  id=mForm:proposalDocuments:dg-data-table_data  10
+  ${count_of_documents}=  Get Matching Xpath Count  xpath=//tbody[@id='mForm:proposalDocuments:dg-data-table_data']/tr
+  [Return]  ${count_of_documents}
 
 
 Отримати дані із документу пропозиції
@@ -898,6 +903,10 @@ Set Multi Ids
   log  ${bid_index}
   log  ${document_index}
   log  ${field}
+  ${result}=  Run Keyword If  '${field}' == 'documentType'
+  ...  Get Text  id=mForm:proposalDocuments:dg-data-table:${document_index}:dg-type-name-txt
+  ${result}=  get_proposal_document_type  ${result}
+  [Return]  ${result}
 
 
 
