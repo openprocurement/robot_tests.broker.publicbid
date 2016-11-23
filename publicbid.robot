@@ -110,7 +110,7 @@ ${bid_number}
   Click Element                       xpath=//ul[@id="mForm:bidItem_0:cReg_items"]/li[text()="м.Київ"]
   Sleep  1
   Input Text                       xpath=//*[@id="mForm:bidItem_0:cTer_input"]  ${item_locality}
-  Sleep  2
+  Wait Until Page Contains Element  id=mForm:bidItem_0:cTer_panel  5
   Click Element                       xpath=//*[@id="mForm:bidItem_0:cTer_panel"]/ul/li[1]
   Sleep  1
   Input text                          id=mForm:bidItem_0:zc  ${item_delivery_postal_code}
@@ -118,13 +118,13 @@ ${bid_number}
   Input text                          id=mForm:rName    ${name}
   Input text                          id=mForm:rPhone    ${telephone}
   Input text                          id=mForm:rMail   ${mail}
-  Завантажити документ до тендеру  ${file_path}  doc
   Sleep  2
   Run Keyword if   '${mode}' == 'multi'   Додати предмет   items
   # Save
   Execute JavaScript  window.scrollTo(0,0)
   Click Element                       xpath=//*[@id="mForm:bSave"]
-  Sleep  5
+  Wait Until Element Is Visible  id=notifyBar  60
+  Sleep  3
   Click Element                       xpath=//*[@id="mForm:needAnnounce"]/div[3]/button/span
   Sleep   5
   # Announce
@@ -161,8 +161,8 @@ ${bid_number}
   Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
   Click Element  id=mForm:docCard:dcType_label
   Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
-  Run Keyword If  '${type}' == 'img'  Click Element  xpath=//*[@id="mForm:docCard:dcType_1"]
-  Run Keyword If  '${type}' == 'doc'  Click Element  xpath=//*[@id="mForm:docCard:dcType_14"]
+  Run Keyword If  '${type}' == 'img'  Click Element  xpath=//*[@id="mForm:docCard:dcType_14"]
+  Run Keyword If  '${type}' == 'doc'  Click Element  xpath=//*[@id="mForm:docCard:dcType_3"]
   Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
   Capture Page Screenshot
   Sleep  5
@@ -175,6 +175,8 @@ ${bid_number}
   Завантажити документ до тендеру  ${file}  doc
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[@id="mForm:bSave"]
+  wait until element is visible  xpath=//*[text()='Збережено!']  120
+  capture page screenshot
   Sleep  5
 
 Завантажити ілюстрацію
@@ -185,13 +187,16 @@ ${bid_number}
   Завантажити документ до тендеру  ${file}  img
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[@id="mForm:bSave"]
-  Sleep  10
+  wait until element is visible  xpath=//*[text()='Збережено!']  120
+  capture page screenshot
+  Sleep  5
 
 Додати Virtual Data Room
   [Arguments]  ${username}  ${tender_uaid}  ${vdr_link}
   Log  ${username}
   Log  ${tender_uaid}
   Log  ${vdr_link}
+  Sleep  5
   Click Element  xpath=//*[text()='Додати посилання на VDR']
   Sleep  2
   Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
@@ -278,17 +283,18 @@ Set Multi Ids
   Wait Until Page Contains Element  id=mForm:search-by-number-input  3
   Input Text   id=mForm:search-by-number-input  ${ARGUMENTS[1]}
   Press Key  id=mForm:search-by-number-input  \\13
-  Sleep  1
+  Sleep  2
   :FOR    ${INDEX}    IN RANGE    1    30
-  \  ${find}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[text()='${ARGUMENTS[1]}']
+  \  ${find}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//p[contains(text(), '${ARGUMENTS[1]}')]/ancestor::div[1]/span[2]/a
   \  Exit For Loop If  '${find}' == 'True'
   \  Sleep  10
-  \  Clear Element Text  id=mForm:search-by-name-input
-  \  Input Text   id=mForm:search-by-name-input  ${ARGUMENTS[1]}
-  \  Press Key  id=mForm:search-by-name-input  \\13
+  \  Clear Element Text  id=mForm:search-by-number-input
+  \  Input Text   id=mForm:search-by-number-input  ${ARGUMENTS[1]}
+  \  Press Key  id=mForm:search-by-number-input  \\13
   \  Sleep  5
-  Click Element    xpath=//*[text()='${ARGUMENTS[1]}']
-  Wait Until Page Contains    ${ARGUMENTS[1]}   10
+  Click Element    xpath=//p[contains(text(), '${ARGUMENTS[1]}')]/ancestor::div[1]/span[2]/a
+  Wait Until Page Contains Element  id=mForm:nBid  30
+  Capture Page Screenshot
 
 Отримати інформацію із тендера
   [Arguments]  @{ARGUMENTS}
@@ -513,14 +519,16 @@ Set Multi Ids
   Switch Browser    ${ARGUMENTS[0]}
   publicbid.Пошук тендера по ідентифікатору    ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
 
-Отримати інформацію про questions[0].title
+Отримати інформацію про questions[${index}].title
   Click Element  xpath=//*[text()="Обговорення"]
   Sleep  5
-  ${return_value}=  Get Text  xpath=//*[@id="mForm:data_data"]/tr[1]/td[1]/span[1]
+  Capture Page Screenshot
+  ${return_value}=  Get Text  id=mForm:data:${index}:title
   [Return]  ${return_value}
 
-Отримати інформацію про questions[0].description
-  ${return_value}=  Get Text  xpath=//*[@id="mForm:data_data"]/tr[1]/td[1]/span[2]
+Отримати інформацію про questions[${index}].description
+  Capture Page Screenshot
+  ${return_value}=  Get Text  id=mForm:data:${index}:description
   [Return]  ${return_value}
 
 Отримати інформацію про questions[0].date
@@ -744,15 +752,20 @@ Set Multi Ids
 
 
 Підтвердити постачальника
-  [Arguments]  @{ARGUMENTS}
-  log many  @{ARGUMENTS}
+  [Arguments]  ${username}  ${tender_uaid}  ${index}
+  capture page screenshot
+  log  ${username}
+  log  ${tender_uaid}
+  log  ${index}
   Sleep  120
   Click Element  xpath=//*[text()='Результати аукціону']
   Wait Until Page Contains Element  xpath=//*[text()='Учасники аукціону']  10
   Click Element  xpath=//*[text()='Учасники аукціону']
-  Sleep  3
+  Wait Until Page Contains Element  xpath=//*[text()='Оцінити']  10
+  capture page screenshot
   Click Element  xpath=//*[text()='Оцінити']
   Sleep  3
+  capture page screenshot
   Click Element  id=mForm:bW
   Click Element  xpath=//*[@id="mForm:confirm-dialog"]/div[3]/button[1]
   Sleep  1
@@ -763,17 +776,30 @@ Set Multi Ids
 
 Отримати інформацію із запитання
   [Arguments]  ${username}  ${tender_uaid}  ${question_id}  ${field}
+  Capture Page Screenshot
+  Log  ${username}
+  Log  ${tender_uaid}
+  Log  ${question_id}
+  Log  ${field}
   Execute JavaScript  window.scrollTo(0,0)
-  Click Element  xpath=//span[./text()='Обговорення']
-  ${question_element_id}=  Get Element Attribute  xpath=//span[starts-with(., '${question_id}')]@style
-  Log  ${question_element_id}
+  ${status}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//span[contains(text(), '${question_id}')]
+  Run Keyword If  ${status} == False  Click Element  xpath=//span[./text()='Обговорення']
+  ${result}=  Run Keyword If  '${field}' == 'title'
+  ...  Get Text  xpath=//span[contains(text(), '${question_id}')]/ancestor::tr/td[1]/span[1]
+  ...  ELSE IF  '${field}' == 'description'
+  ...  Get Text  xpath=//span[contains(text(), '${question_id}')]/ancestor::tr/td[1]/span[2]
+  Log  ${result}
+  [Return]  ${result}
 
 Скасувати закупівлю
   [Arguments]  ${username}  ${tender_uaid}  ${cancellation_reason}  ${cancellation_file}  ${cancellation_description}
   publicbid.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Click Element  id=mForm:tender-cancel-btn
   Wait Until Page Contains Element  id=mForm:cReason  10
-  Input Text  id=mForm:cReason  ${cancellation_reason}
+  Click Element  id=mForm:cReason
+  Wait Until Page Contains Element  id=mForm:cReason_panel  10
+  Sleep  1
+  Click Element  xpath=//*[text()='${cancellation_reason}']
   Choose File  id=mForm:docFile_input  ${cancellation_file}
   Wait Until Page Contains Element  xpath=//*[text()="Картка документу"]  10
   Input Text  xpath=//*[@id="mForm:docCard:docCard"]/table/tbody/tr[2]/td[2]/textarea  ${cancellation_description}
@@ -805,3 +831,80 @@ Set Multi Ids
   ${return_value}=  Get Text  id=${field_id}
   ${return_value}=  Convert To String  ${return_value}
   [Return]  ${return_value}
+
+
+Відповісти на запитання
+  [Arguments]  ${username}  ${tender_uaid}  ${answer_data}  ${question_id}
+  [Documentation]  Можливість відповісти на запитання
+  ...      ${username}  ==  username
+  ...      ${tender_uaid}  ==  tender_uaid
+  ...      ${answer_data}  ==  answer_data
+  ...      ${question_id}  ==  question_id
+  log  ${username}
+  log  ${tender_uaid}
+  log  ${answer_data}
+  log  ${question_id}
+  Capture Page Screenshot
+  ${status}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//span[contains(text(), '${question_id}')]
+  Run Keyword If  ${status} == False
+  ...  Run Keywords
+  ...    Click Element  id=mForm:tender-discussion-btn
+  ...    AND  wait until page contains element  xpath=//span[contains(text(), '${question_id}')]  10
+  ...    AND  capture page screenshot
+  Click Element  xpath=//span[contains(text(), '${question_id}')]/ancestor::tr/td[5]/button
+  Wait Until Page Contains Element  id=mForm:messQ  10
+  Input Text  id=mForm:messQ  ${answer_data.data.answer}
+  Click Element  id=mForm:btnR
+  Capture Page Screenshot
+
+
+Отримати інформацію про eligibilityCriteria
+  Capture Page Screenshot
+
+
+Скасування рішення кваліфікаційної комісії
+  [Arguments]  ${username}  ${tender_uaid}  ${index}
+  capture page screenshot
+  log  ${username}
+  log  ${tender_uaid}
+  log  ${index}
+
+
+Завантажити документ рішення кваліфікаційної комісії
+  [Arguments]  ${username}  ${file}  ${tender_uaid}  ${index}
+  capture page screenshot
+  log  ${username}
+  log  ${file}
+  log  ${tender_uaid}
+  log  ${index}
+
+
+Отримати кількість документів в ставці
+  [Arguments]  ${username}  ${tebder_uaid}  ${index}
+  capture page screenshot
+  click element  id=mForm:auction-results-btn
+  wait until page contains element  id=mForm:mForm:auctions-bidders-btn  10
+  click element  id=mForm:mForm:auctions-bidders-btn
+  log  ${username}
+  log  ${tebder_uaid}
+  log  ${index}
+
+
+Отримати дані із документу пропозиції
+  [Arguments]  ${username}  ${tender_uaid}  ${bid_index}  ${document_index}  ${field}
+  capture page screenshot
+  log  ${username}
+  log  ${tender_uaid}
+  log  ${bid_index}
+  log  ${document_index}
+  log  ${field}
+
+
+
+Дискваліфікувати постачальника
+  [Arguments]  ${username}  ${tender_uaid}  ${index}  ${description}
+  capture page screenshot
+  log  ${username}
+  log  ${tender_uaid}
+  log  ${index}
+  log  ${description}
