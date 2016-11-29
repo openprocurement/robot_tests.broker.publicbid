@@ -559,10 +559,6 @@ Set Multi Ids
   ...      ${username} ==  username
   ...      ${tender_uaid} ==  tender_uaid
   ...      ${bid_data} ==  bid_data
-  ${status}=  Run Keyword And Return Status
-  ...  Dictionary Should Not Contain Key  ${bid_data.data}  qualified  "Неможливо подати пропозицію без кваліфікації"
-  Run Keyword If  ${status} == False
-  ...  Fail  "Неможливо подати пропозицію без кваліфікації"
   ${amount}=  Get From Dictionary   ${bid_data.data.value}  amount
   publicbid.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Click Element  xpath=//*[text()='Подати пропозицію в тестовому режимі']
@@ -586,11 +582,20 @@ Set Multi Ids
   Sleep  2
   Click Element  xpath=//*[@id="mForm:proposalSaveInfo"]/div[3]/button
   Sleep  2
+  ${is_qualified}=  is_qualified  ${bid_data}  ${username}
+  Run Keyword If  ${is_qualified} == False
+  ...  Змінити кваліфікацію пропозиції  ${username}  ${tender_uaid}  ${False}
+  reload page
+  ${qualified_message_does_not_exist}=  run keyword and return status  page should not contain element  xpath=//*[text()='Перевіряється оплата гарантійного внеску']
+  run keyword if  ${qualified_message_does_not_exist} == False
+  ...  Fail  "Неможливо подати пропозицію без кваліфікації"
   Click Element  xpath=//*[text()='Зареєструвати пропозицію']
   Sleep  5
   ${bid_number}=  Get Text  xpath=//*[@id="mForm:data"]/table/tbody/tr[3]/td[2]
   Capture Page Screenshot
   Sleep  60
+  reload page
+  Capture Page Screenshot
   [Return]  ${bid_number}
 
 Отримати інформацію із пропозиції
@@ -909,18 +914,11 @@ Set Multi Ids
   wait until page contains element  id=mForm:mForm:auctions-bidders-btn  10
   click element  id=mForm:mForm:auctions-bidders-btn
   Sleep  5
-
   ${award_count}=  Get Matching Xpath Count  xpath=//*[@id="mForm:data_data"]/tr
-
   log  ${index}
   log  ${award_count}
-
-  ${index}=  run keyword if  ${index} < 0
-  ...  evaluate  ${award_count} + ${index}
-  ...  ELSE  evaluate  ${index}
-
+  ${index}=  get_award_index  ${index}  ${award_count}
   log  ${index}
-
   ${status}=  Run Keyword And Return Status  Page Should Contain Element  id=mForm:data:${index}:rate-btn
   ${button_id}=  Run Keyword If  ${status} == True
   ...  Set Variable  mForm:data:${index}:rate-btn
@@ -1034,3 +1032,29 @@ Set Multi Ids
   click element  id=mForm:proposalSaveBtn
   Wait Until Element Is Visible  id=notifyBar  120
   sleep  3
+
+Змінити кваліфікацію пропозиції
+  [Arguments]  ${username}  ${tender_uaid}  ${change}
+  Open Browser  ${USERS.users['${username}'].homepage}  ${USERS.users['${username}'].browser}  alias=ADMIN
+  Set Window Size   @{USERS.users['${username}'].size}
+  Set Window Position   @{USERS.users['${username}'].position}
+
+  Run Keyword And Ignore Error   Wait Until Page Contains Element    xpath=//*[text()='Вхід']   10
+  Click Element                      xpath=//*[text()='Вхід']
+  Run Keyword And Ignore Error   Wait Until Page Contains Element   id=mForm:email   10
+  Input text   id=mForm:email      test_eauction@yopmail.com
+  Input text   id=mForm:pwd      P@ssw0rd
+  Click Button   id=mForm:login
+  Sleep  3
+  ${present}=  Run Keyword And Return Status    Element Should Be Visible   id=mForm:existNotResolvedQuestionsOrAppealsDialog
+  Run Keyword If  ${present}  Click Element  xpath=//*[@id='mForm:existNotResolvedQuestionsOrAppealsDialog']/div[3]/a
+  Sleep  4
+  Click Element  id=menu-admin-logged-in-lnk
+  wait until page contains element  xpath=//a[contains(text(), '${tender_uaid}')]/ancestor::div[3]/div[3]/p[2]/button
+  click element  xpath=//a[contains(text(), '${tender_uaid}')]/ancestor::div[3]/div[3]/p[2]/button
+  Sleep  5
+  click element  xpath=//a[contains(text(), '${tender_uaid}')]/ancestor::div[3]/div[4]/div/p[2]/button
+  Sleep  5
+  Switch Browser  ${username}
+
+

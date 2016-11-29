@@ -65,7 +65,6 @@ def capitalize_first_letter(string):
 
 
 def get_field_id(field_id):
-
     fields = {
         'value.amount': 'mForm:budget',
         'minimalStep.amount': 'mForm:step',
@@ -77,7 +76,7 @@ def get_field_id(field_id):
 
 def get_field_value(field_id, field_value):
     values = {
-        'value.amount':  field_value['amount'],
+        'value.amount': field_value['amount'],
         'minimalStep.amount': field_value['amount'],
         'title': field_value
     }
@@ -98,10 +97,15 @@ def get_proposal_document_type(key):
     return proposalDocumentTypes[unicode(key).encode('utf-8')]
 
 
+def is_qualified(bid_data, username):
+    if username == 'Publicbid_Provider1':
+        if 'qualified' in bid_data['data']:
+            return False
+    return True
 
 
-
-
-
-
-
+def get_award_index(index, awards_count):
+    if index < 0:
+        return awards_count + index
+    else:
+        return index
