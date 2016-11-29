@@ -612,19 +612,11 @@ Set Multi Ids
 
 
 Пошук цінової пропозиції
-  [Arguments]  @{ARGUMENTS}
-  Log Many  @{ARGUMENTS}
-  Switch browser   ${ARGUMENTS[0]}
+  [Arguments]  ${username}  ${tender_uaid}
   Click Element  xpath=//div[contains(@class, 'cabinet-user-name')]
-  Sleep  3
-  Click Element  xpath=//*[@id="wrapper"]/div/span
-  Capture Page Screenshot
-  Sleep  2
-  Click Element  xpath=//*[text()='Мої пропозиції']
-  Sleep  3
-  Capture Page Screenshot
-  Click Element  xpath=//*[@id="mForm:proposalList:0:asdasd"]/div[1]/div/span[1]/a
-  Sleep  5
+  wait until page contains element  xpath=//a[contains(text(), '${tender_uaid}')]/ancestor::div[2]/div[1]/div/span[1]/a  60
+  Click Element  xpath=//a[contains(text(), '${tender_uaid}')]/ancestor::div[2]/div[1]/div/span[1]/a
+  wait until page contains element  id=mForm:amount  30
 
 
 Відповісти на питання
@@ -700,14 +692,13 @@ Set Multi Ids
   [Return]  ${return_value}
 
 Змінити документ в ставці
-  [Arguments]  @{ARGUMENTS}
-  Log Many  @{ARGUMENTS}
-  Пошук цінової пропозиції  ${ARGUMENTS[0]}
+  [Arguments]  ${username}  ${tender_uaid}  ${file}  ${doc_id}
+  Пошук цінової пропозиції  ${username}  ${tender_uaid}
   Click Element  xpath=//*[@id="mForm:pnlFilesQ""]/div/div/div/table/tbody/tr[1]/td[5]/button[2]
   Sleep  1
   Click Element  xpath=//div[contains(@class, "ui-confirm-dialog") and @aria-hidden="false"]//span[text()="Так"]
   Sleep  1
-  Choose File       xpath=//input[@id="mForm:qFile_input"]    ${ARGUMENTS[1]}
+  Choose File       xpath=//input[@id="mForm:qFile_input"]    ${file}
   Sleep  3
   Capture Page Screenshot
   Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
@@ -1026,3 +1017,20 @@ Set Multi Ids
 Завантажити фінансову ліцензію
   [Arguments]  ${username}  ${tender_uaid}  ${license_path}
   capture page screenshot
+
+
+Завантажити протокол аукціону
+  [Arguments]  ${username}  ${tender_uaid}  ${auction_protocol_path}  ${bid_index}
+  capture page screenshot
+  Пошук цінової пропозиції  ${username}  ${tender_uaid}
+  click element  xpath=//*[text()='Додати документи до пропозиції']
+  Sleep  2
+  click element  id=mForm:qFile_input
+  wait until page contains element  id=mForm:docCard:dcType_label  10
+  click element  id=mForm:docCard:dcType_label
+  click element  id=mForm:docCard:dcType_1
+  click element  id=mForm:docCard:dc-save-btn
+  sleep  3
+  click element  id=mForm:proposalSaveBtn
+  Wait Until Element Is Visible  id=notifyBar  120
+  sleep  3
