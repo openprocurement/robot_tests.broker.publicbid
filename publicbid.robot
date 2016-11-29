@@ -794,7 +794,7 @@ Set Multi Ids
   Click Element  id=mForm:cReason
   Wait Until Page Contains Element  id=mForm:cReason_panel  10
   Sleep  1
-  Click Element  xpath=//*[text()='${cancellation_reason}']
+  Click Element  xpath=//li[text()='${cancellation_reason}']
   Choose File  id=mForm:docFile_input  ${cancellation_file}
   Wait Until Page Contains Element  xpath=//*[text()="Картка документу"]  10
   Input Text  xpath=//*[@id="mForm:docCard:docCard"]/table/tbody/tr[2]/td[2]/textarea  ${cancellation_description}
