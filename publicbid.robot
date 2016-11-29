@@ -554,18 +554,19 @@ Set Multi Ids
   [Return]  ${return_value}
 
 Подати цінову пропозицію
-  [Arguments]  @{ARGUMENTS}
+  [Arguments]  ${username}  ${tender_uaid}  ${bid_data}
   [Documentation]
-  ...      ${ARGUMENTS[0]} ==  username
-  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
-  ...      ${ARGUMENTS[2]} ==  ${test_bid_data}
-  log many  @{ARGUMENTS}
-  ${amount}=  Get From Dictionary   ${ARGUMENTS[2].data.value}  amount
-  publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
-  ${tender_status}=  Get Text  xpath=//*[@id="mForm:status"]
-  Run Keyword If  '${tender_status}' == 'Період уточнень'  Fail  "Неможливо подати цінову пропозицію в період уточнень"
-  Click Element  xpath=//*[text()='Подати пропозицію']
-  Sleep  2
+  ...      ${username} ==  username
+  ...      ${tender_uaid} ==  tender_uaid
+  ...      ${bid_data} ==  bid_data
+  ${status}=  Run Keyword And Return Status
+  ...  Dictionary Should Not Contain Key  ${bid_data.data}  qualified  "Неможливо подати пропозицію без кваліфікації"
+  Run Keyword If  ${status} == False
+  ...  Fail  "Неможливо подати пропозицію без кваліфікації"
+  ${amount}=  Get From Dictionary   ${bid_data.data.value}  amount
+  publicbid.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Click Element  xpath=//*[text()='Подати пропозицію в тестовому режимі']
+  Wait Until Page Contains Element  id=mForm:amount  10
   ${amount}=  convert to string  ${amount}
   Input Text  xpath=//*[@id="mForm:amount"]  ${amount}
   ${financial_license_path}  ${file_title}  ${file_content}=  create_fake_doc
@@ -1020,4 +1021,8 @@ Set Multi Ids
   Input Text  id=mForm:messQ  ${question_data.data.description}
   click element  id=mForm:btnQ
   Sleep  5
+  capture page screenshot
+
+Завантажити фінансову ліцензію
+  [Arguments]  ${username}  ${tender_uaid}  ${license_path}
   capture page screenshot
