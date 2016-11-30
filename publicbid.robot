@@ -757,7 +757,7 @@ Set Multi Ids
   log  ${username}
   log  ${tender_uaid}
   log  ${index}
-  publicbid.пошук учасника закупівлі  ${username}  ${tender_uaid}  ${index}
+  Пошук учасника закупівлі  ${username}  ${tender_uaid}  ${index}
   capture page screenshot
   Click Element  id=mForm:bW
   Click Element  id=mForm:cdWinner-yes-btn
