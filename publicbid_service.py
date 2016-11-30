@@ -97,14 +97,16 @@ def get_proposal_document_type(key):
     return proposalDocumentTypes[unicode(key).encode('utf-8')]
 
 
-def is_qualified(bid_data, username):
-    if username == 'Publicbid_Provider1':
-        if 'qualified' in bid_data['data']:
-            return False
+def is_qualified(bid_data):
+    if 'qualified' in bid_data['data']:
+        return False
     return True
 
 
 def get_award_index(index, awards_count):
+    index = int(index)
+    awards_count = int(awards_count)
+
     if index < 0:
         return awards_count + index
     else:

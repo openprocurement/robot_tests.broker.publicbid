@@ -114,7 +114,7 @@ ${bid_number}
   Click Element                       xpath=//ul[@id="mForm:bidItem_0:cReg_items"]/li[text()="м.Київ"]
   Sleep  1
   Input Text                       xpath=//*[@id="mForm:bidItem_0:cTer_input"]  ${item_locality}
-  Wait Until Page Contains Element  id=mForm:bidItem_0:cTer_panel  5
+  Wait Until Page Contains Element  id=mForm:bidItem_0:cTer_panel  10
   Click Element                       xpath=//*[@id="mForm:bidItem_0:cTer_panel"]/ul/li[1]
   Sleep  1
   Input text                          id=mForm:bidItem_0:zc  ${item_delivery_postal_code}
@@ -275,29 +275,28 @@ Set Multi Ids
   Click Element                      xpath=//div[@id='mForm:cDkpp3_panel']/table/tbody/tr/td[1]/span
 
 Пошук тендера по ідентифікатору
-  [Arguments]  @{ARGUMENTS}
+  [Arguments]  ${username}  ${tender_uaid}
   [Documentation]
-  ...      ${ARGUMENTS[0]} ==  username
-  ...      ${ARGUMENTS[1]} ==  tenderId
-  ...      ${ARGUMENTS[2]} ==  id
+  ...      ${username} ==  username
+  ...      ${tender_uaid} ==  tender_uaid
   Click Element  xpath=//a[./text()="Електронні торги"]
-  Wait Until Page Contains Element    xpath=//*[text()='ОГОЛОСИТИ ЕЛЕКТРОННІ ТОРГИ']   10
+  Wait Until Page Contains Element    id=mForm:search_button   10
   Click Element  xpath=//*[text()='Переглянути тестові електронні торги']
   wait until page contains element  xpath=//*[text()='ТЕСТОВИЙ РЕЖИМ']  60
   Click Element  xpath=//*[@id="buttons"]/button[4]
   Wait Until Page Contains Element  id=mForm:search-by-number-input  3
-  Input Text   id=mForm:search-by-number-input  ${ARGUMENTS[1]}
+  Input Text   id=mForm:search-by-number-input  ${tender_uaid}
   Press Key  id=mForm:search-by-number-input  \\13
   Sleep  2
   :FOR    ${INDEX}    IN RANGE    1    30
-  \  ${find}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//p[contains(text(), '${ARGUMENTS[1]}')]/ancestor::div[1]/span[2]/a
+  \  ${find}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//p[contains(text(), '${tender_uaid}')]/ancestor::div[1]/span[2]/a
   \  Exit For Loop If  '${find}' == 'True'
   \  Sleep  10
   \  Clear Element Text  id=mForm:search-by-number-input
-  \  Input Text   id=mForm:search-by-number-input  ${ARGUMENTS[1]}
+  \  Input Text   id=mForm:search-by-number-input  ${tender_uaid}
   \  Press Key  id=mForm:search-by-number-input  \\13
   \  Sleep  5
-  Click Element    xpath=//p[contains(text(), '${ARGUMENTS[1]}')]/ancestor::div[1]/span[2]/a
+  Click Element    xpath=//p[contains(text(), '${tender_uaid}')]/ancestor::div[1]/span[2]/a
   Wait Until Page Contains Element  id=mForm:nBid  30
   Capture Page Screenshot
 
@@ -582,7 +581,7 @@ Set Multi Ids
   Sleep  2
   Click Element  xpath=//*[@id="mForm:proposalSaveInfo"]/div[3]/button
   Sleep  2
-  ${is_qualified}=  is_qualified  ${bid_data}  ${username}
+  ${is_qualified}=  is_qualified  ${bid_data}
   Run Keyword If  ${is_qualified} == False
   ...  Змінити кваліфікацію пропозиції  ${username}  ${tender_uaid}  ${False}
   reload page
@@ -724,19 +723,22 @@ Set Multi Ids
   Capture Page Screenshot
   Пошук учасника закупівлі  ${username}  ${tender_uaid}  0
   ${financial_license_path}  ${file_title}  ${file_content}=  create_fake_doc
-  Choose File  id=mForm:contract-project-upload-input_input  ${financial_license_path}
+  Choose File  id=mForm:contract-signed-upload-input_input  ${financial_license_path}
   Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
   Click Element  id=mForm:docCard:dcType_label
   Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
   Click Element  xpath=//*[@id="mForm:docCard:dcType_2"]
   Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
-  Sleep  2
+  Sleep  5
   ${current_date}=  Get Current Date
   ${current_date}=  publicbid_service.convert_date_to_string  ${current_date}
-  Input text  xpath=//*[@id="mForm:dc_input"]  ${current_date}
-  Input text  xpath=//*[@id="mForm:contractNumber"]  123456
+  Input text  id=mForm:dc_input  ${current_date}
+  Input text  id=mForm:contractNumber  123456
+  sleep  3
+  capture page screenshot
   Click Element  id=mForm:bS
   Wait Until Element Is Visible  id=notifyBar  120
+  Sleep  3
   Capture Page Screenshot
   Click Element  id=mForm:bS2
   Capture Page Screenshot
