@@ -532,18 +532,22 @@ Set Multi Ids
 
 Отримати інформацію про questions[${index}].description
   Capture Page Screenshot
-  ${return_value}=  Get Text  id=mForm:data:${index}:description
+  ${xpath}=  publicbid_service.get_question_answer_by_type_xpath  question  ${index}
+  ${return_value}=  Get Text  xpath=${xpath}
   [Return]  ${return_value}
 
-Отримати інформацію про questions[0].date
+Отримати інформацію про questions[${index}].date
   ${return_value}=  Get Text  xpath=//*[@id="mForm:data_data"]/tr/td[4]
   ${return_value}=  publicbid_service.parse_date  ${return_value}
   [Return]  ${return_value}
 
-Отримати інформацію про questions[0].answer
+Отримати інформацію про questions[${index}].answer
+  capture page screenshot
   Click Element  xpath=//*[text()="Обговорення"]
   Sleep  5
-  ${return_value}=  Get Text  xpath=//*[@id="mForm:data_data"]/tr[2]/td[1]/span[2]
+  capture page screenshot
+  ${xpath}=  get_question_answer_by_type_xpath  answer  ${index}
+  ${return_value}=  Get Text  xpath=${xpath}
   [Return]  ${return_value}
 
 Отримати інформацію про auctionPeriod.endDate
@@ -581,7 +585,7 @@ Set Multi Ids
   Sleep  2
   Click Element  xpath=//*[@id="mForm:proposalSaveInfo"]/div[3]/button
   Sleep  2
-  ${is_qualified}=  is_qualified  ${bid_data}
+  ${is_qualified}=  publicbid_service.is_qualified  ${bid_data}
   Run Keyword If  ${is_qualified} == False
   ...  Змінити кваліфікацію пропозиції  ${username}  ${tender_uaid}  ${False}
   reload page
@@ -781,10 +785,9 @@ Set Multi Ids
   Execute JavaScript  window.scrollTo(0,0)
   ${status}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//span[contains(text(), '${question_id}')]
   Run Keyword If  ${status} == False  Click Element  xpath=//span[./text()='Обговорення']
-  ${result}=  Run Keyword If  '${field}' == 'title'
-  ...  Get Text  xpath=//span[contains(text(), '${question_id}')]/ancestor::tr/td[1]/span[1]
-  ...  ELSE IF  '${field}' == 'description'
-  ...  Get Text  xpath=//span[contains(text(), '${question_id}')]/ancestor::tr/td[1]/span[2]
+  capture page screenshot
+  ${xpath}=  publicbid_service.get_question_xpath  ${field}  ${question_id}
+  ${result}=  get text  xpath=${xpath}
   Log  ${result}
   [Return]  ${result}
 
@@ -823,12 +826,21 @@ Set Multi Ids
 
 Отримати інформацію із документа
   [Arguments]  ${username}  ${tender_uaid}  ${document_id}  ${field}
+  Reload Page
   Capture Page Screenshot
-  ${field_id}=  get_cancellation_field_id  ${field}
-  ${return_value}=  Get Text  id=${field_id}
+  ${field_xpath}=  get_document_field_xpath  ${field}  ${document_id}
+  ${return_value}=  Get Text  xpath=${field_xpath}
   ${return_value}=  Convert To String  ${return_value}
   [Return]  ${return_value}
 
+Отримати документ
+  [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
+  ${field_xpath}=  get_document_field_xpath  title  ${doc_id}
+  ${url}=  Get Element Attribute  xpath=${field_xpath}@href
+  ${return_value}=  Get Text  xpath=${field_xpath}
+  ${return_value}=  Convert To String  ${return_value}
+  publicbid_service.download_file  ${url}  ${return_value}
+  [Return]  ${return_value}
 
 Відповісти на запитання
   [Arguments]  ${username}  ${tender_uaid}  ${answer_data}  ${question_id}
@@ -919,7 +931,7 @@ Set Multi Ids
   ${award_count}=  Get Matching Xpath Count  xpath=//*[@id="mForm:data_data"]/tr
   log  ${index}
   log  ${award_count}
-  ${index}=  get_award_index  ${index}  ${award_count}
+  ${index}=  publicbid_service.get_award_index  ${index}  ${award_count}
   log  ${index}
   ${status}=  Run Keyword And Return Status  Page Should Contain Element  id=mForm:data:${index}:rate-btn
   ${button_id}=  Run Keyword If  ${status} == True

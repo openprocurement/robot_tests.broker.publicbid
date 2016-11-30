@@ -3,6 +3,9 @@ from datetime import datetime
 import dateutil.parser
 import json
 import pytz
+import os
+import urllib
+from robot.libraries.BuiltIn import BuiltIn
 
 TZ = pytz.timezone('Europe/Kiev')
 
@@ -84,10 +87,9 @@ def get_field_value(field_id, field_value):
     return values[field_id]
 
 
-def get_cancellation_field_id(field_id):
+def get_document_field_xpath(field_id, document_id):
     values = {
-        'title': 'mForm:cancellation-docs:dg-data-table:0:dg-file-api-lnk',
-        'description': 'mForm:cancellation-docs:dg-data-table:0:dg-description-text'
+        'title': "//div[@id='mForm:pnlFiles']/descendant::a[contains(text(), '" + document_id + "')]"
     }
 
     return values[field_id]
@@ -111,3 +113,26 @@ def get_award_index(index, awards_count):
         return awards_count + index
     else:
         return index
+
+
+def get_question_xpath(field, question_id):
+    values = {
+        'title': "//span[contains(text(), '" + question_id + "')]/ancestor::tr/td[1]/span[1]",
+        'description': "//span[contains(text(), '" + question_id + "')]/ancestor::tr/td[1]/span[2]"
+    }
+    return values[field]
+
+
+def get_question_answer_by_type_xpath(question_type, index):
+    if question_type == 'question':
+        identifier = ((int(index) + 1) * 2) - 2
+    else:
+        identifier = ((int(index) + 1) * 2) - 1
+
+    xpath = "//*[@id='mForm:data:" + str(identifier) + ":description']"
+    return xpath
+
+
+def download_file(url, file_name):
+   output_dir = BuiltIn().get_variable_value("${OUTPUT_DIR}")
+   urllib.urlretrieve(url, os.path.join(output_dir, file_name))
