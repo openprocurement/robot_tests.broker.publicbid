@@ -13,7 +13,8 @@ tenderCodes = {
     "Період аукціону": "active.auction",
     "Очікування пропозицій": "active.tendering",
     "Кваліфікація переможця": "active.qualification",
-    "Аукціон не відбувся": "unsuccessful"
+    "Аукціон не відбувся": "unsuccessful",
+    "Відмінений аукціон": "cancelled"
 }
 
 cancellationCodes = {
@@ -89,9 +90,9 @@ def get_field_value(field_id, field_value):
 
 def get_document_field_xpath(field_id, document_id):
     values = {
-        'title': "//div[@id='mForm:pnlFiles']/descendant::a[contains(text(), '" + document_id + "')]"
+        'title': "//a[contains(text(), '" + document_id + "')]",
+        'description': "//a[contains(text(), '" + document_id + "')]/ancestor::tr[1]/td[3]/span"
     }
-
     return values[field_id]
 
 
@@ -134,5 +135,5 @@ def get_question_answer_by_type_xpath(question_type, index):
 
 
 def download_file(url, file_name):
-   output_dir = BuiltIn().get_variable_value("${OUTPUT_DIR}")
-   urllib.urlretrieve(url, os.path.join(output_dir, file_name))
+    output_dir = BuiltIn().get_variable_value("${OUTPUT_DIR}")
+    urllib.urlretrieve(url, os.path.join(output_dir, file_name))

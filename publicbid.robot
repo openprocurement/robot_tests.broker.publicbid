@@ -757,15 +757,7 @@ Set Multi Ids
   log  ${username}
   log  ${tender_uaid}
   log  ${index}
-  ${status}=  Run Keyword And Return Status  Page Should Contain Element  id=mForm:auction-results-btn
-  Run Keyword If  ${status} == True  Run Keywords
-  ...  Click Element  id=mForm:auction-results-btn
-  ...  Wait Until Page Contains Element  id=mForm:mForm:auctions-bidders-btn  10
-  ...  Click Element  id=mForm:mForm:auctions-bidders-btn
-  ...  Wait Until Page Contains Element  id=mForm:data:${index}:rate-btn  10
-  ...  capture page screenshot
-  ...  Click Element  id=mForm:data:${index}:rate-btn
-  ...  Wait Until Page Contains Element  id=mForm:bW
+  publicbid.пошук учасника закупівлі  ${username}  ${tender_uaid}  ${index}
   capture page screenshot
   Click Element  id=mForm:bW
   Click Element  id=mForm:cdWinner-yes-btn
@@ -821,7 +813,9 @@ Set Multi Ids
 
 Отримати інформацію про cancellations[0].reason
   Capture Page Screenshot
-  ${return_value}=  Get Text  id=mForm:cReason
+  Click Element  id=mForm:cancellation-reason-lnk
+  wait until page contains element  id=mForm:cReason-txt  10
+  ${return_value}=  Get Text  id=mForm:cReason-txt
   [Return]  ${return_value}
 
 Отримати інформацію із документа
