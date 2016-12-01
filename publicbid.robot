@@ -621,13 +621,15 @@ Set Multi Ids
 
 Пошук цінової пропозиції
   [Arguments]  ${username}  ${tender_uaid}
-  log  ${USERS.users['${username}'].bidresponses.resp}
   Click Element  xpath=//div[contains(@class, 'cabinet-user-name')]
-  wait until page contains element  xpath=//a[contains(text(), 'Пропозиція № ${USERS.users['${username}'].bidresponses.resp}')]  60
-  Click Element  xpath=//a[contains(text(), 'Пропозиція № ${USERS.users['${username}'].bidresponses.resp}')]
+  wait until page contains element  xpath=//a[contains(text(), '${tender_uaid}')]  60
+  ${proposal_count}=  Get Matching Xpath Count  xpath=//a[contains(text(), '${tender_uaid}')]/ancestor::div[2]/div[1]/div/span[1]/a
+  run keyword if  ${proposal_count} > 1
+  ...  Click Element  xpath=//a[contains(text(), 'Пропозиція № ${USERS.users['${username}'].bidresponses.resp}')]
+  ...  ELSE
+  ...  Click Element  xpath=//a[contains(text(), '${tender_uaid}')]/ancestor::div[2]/div[1]/div/span[1]/a
   wait until page contains element  id=mForm:amount  30
   capture page screenshot
-
 
 Відповісти на питання
   [Arguments]  @{ARGUMENTS}
@@ -1034,7 +1036,7 @@ Set Multi Ids
   Пошук цінової пропозиції  ${username}  ${tender_uaid}
   click element  xpath=//*[text()='Додати документи до пропозиції']
   Sleep  2
-  click element  id=mForm:qFile_input
+  Choose File  id=mForm:qFile_input  ${auction_protocol_path}
   wait until page contains element  id=mForm:docCard:dcType_label  10
   click element  id=mForm:docCard:dcType_label
   click element  id=mForm:docCard:dcType_1
