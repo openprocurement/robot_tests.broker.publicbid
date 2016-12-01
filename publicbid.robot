@@ -594,7 +594,7 @@ Set Multi Ids
   ...  Fail  "Неможливо подати пропозицію без кваліфікації"
   Click Element  xpath=//*[text()='Зареєструвати пропозицію']
   Sleep  5
-  ${bid_number}=  Get Text  xpath=//*[@id="mForm:data"]/table/tbody/tr[3]/td[2]
+  ${bid_number}=  Get Text  id=mForm:proposal_nompp
   Capture Page Screenshot
   Sleep  60
   reload page
