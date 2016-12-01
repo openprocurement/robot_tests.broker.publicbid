@@ -14,7 +14,8 @@ tenderCodes = {
     "Очікування пропозицій": "active.tendering",
     "Кваліфікація переможця": "active.qualification",
     "Аукціон не відбувся": "unsuccessful",
-    "Відмінений аукціон": "cancelled"
+    "Відмінений аукціон": "cancelled",
+    "Завершений аукціон": "complete"
 }
 
 cancellationCodes = {

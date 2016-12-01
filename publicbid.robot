@@ -621,10 +621,12 @@ Set Multi Ids
 
 Пошук цінової пропозиції
   [Arguments]  ${username}  ${tender_uaid}
+  log  ${USERS.users['${username}'].bidresponses.resp}
   Click Element  xpath=//div[contains(@class, 'cabinet-user-name')]
-  wait until page contains element  xpath=//a[contains(text(), '${tender_uaid}')]/ancestor::div[2]/div[1]/div/span[1]/a  60
-  Click Element  xpath=//a[contains(text(), '${tender_uaid}')]/ancestor::div[2]/div[1]/div/span[1]/a
+  wait until page contains element  xpath=//a[contains(text(), 'Пропозиція № ${USERS.users['${username}'].bidresponses.resp}')]  60
+  Click Element  xpath=//a[contains(text(), 'Пропозиція № ${USERS.users['${username}'].bidresponses.resp}')]
   wait until page contains element  id=mForm:amount  30
+  capture page screenshot
 
 
 Відповісти на питання
@@ -673,8 +675,8 @@ Set Multi Ids
   [Return]  ${url}
 
 Змінити цінову пропозицію
-  [Arguments]  ${username}  ${bid_number}  ${field}  ${new_amount}
-  Пошук цінової пропозиції  ${username}  ${bid_number}
+  [Arguments]  ${username}  ${tender_uaid}  ${field}  ${new_amount}
+  Пошук цінової пропозиції  ${username}  ${tender_uaid}
   ${new_amount}=  convert to string  ${new_amount}
   Input Text  xpath=//*[@id="mForm:amount"]  ${new_amount}
   Click Element  xpath=//*[text()='Зберегти']
@@ -822,6 +824,7 @@ Set Multi Ids
   [Arguments]  ${username}  ${tender_uaid}  ${document_id}  ${field}
   Reload Page
   Capture Page Screenshot
+  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
   ${field_xpath}=  get_document_field_xpath  ${field}  ${document_id}
   ${return_value}=  Get Text  xpath=${field_xpath}
   ${return_value}=  Convert To String  ${return_value}
