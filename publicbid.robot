@@ -937,7 +937,16 @@ Set Multi Ids
   ...  Set Variable  mForm:data:${index}:rate-btn
   ...  ELSE  Set Variable  mForm:data:${index}:rate-contract-sign-btn
   click element  id=${button_id}
-  wait until page contains element  id=mForm:proposalDocuments:dg-data-table_data  10
+  Sleep  15
+  ${auction_protocol_loaded}=  run keyword and return status  page should contain element  id=mForm:proposalDocuments:dg-data-table_data
+  :FOR    ${INDEX}    IN RANGE    1    25
+  \  capture page screenshot
+  \  Exit For Loop If  ${auction_protocol_loaded} == True
+  \  Sleep  3
+  \  ${auction_protocol_loaded}=  run keyword and return status  page should contain element  id=mForm:proposalDocuments:dg-data-table_data
+  \  Run Keyword If  ${auction_protocol_loaded} == False  Sleep  15
+  \  Run Keyword If  ${auction_protocol_loaded} == False  Reload Page
+  \  capture page screenshot
   capture page screenshot
 
 
