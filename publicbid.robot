@@ -5,6 +5,7 @@ Library  DateTime
 Library  publicbid_json_util.py
 Library  publicbid_service.py
 Library  op_robot_tests.tests_files.service_keywords
+Resource  view.robot
 
 *** Variables ***
 ${mail}          test_test@test.com
@@ -56,20 +57,15 @@ ${bid_number}
   ${items}=         Get From Dictionary   ${prepared_tender_data}               items
   ${title}=         Get From Dictionary   ${prepared_tender_data}               title
   ${description}=   Get From Dictionary   ${prepared_tender_data}               description
+  ${guarantee}=  Get From Dictionary  ${prepared_tender_data}  guarantee
   ${dgfID}=  Get From Dictionary  ${prepared_tender_data}  dgfID
+  ${dgfDecisionDate}=  Get From Dictionary  ${prepared_tender_data}  dgfDecisionDate
+  ${dgfDecisionID}=  Get From Dictionary  ${prepared_tender_data}  dgfDecisionID
   ${budget}=        get_budget   ${prepared_tender_data}
   ${step_rate}=     get_step_rate  ${prepared_tender_data}
   ${auctionPeriod}=  Get From Dictionary  ${prepared_tender_data}  auctionPeriod
   ${auctionPeriod_start_date}=  publicbid_service.convert_date_to_string  ${auctionPeriod.startDate}
   ${countryName}=   Get From Dictionary   ${prepared_tender_data.procuringEntity.address}       countryName
-  ${item_description}=  Get From Dictionary  ${items[0]}  description
-  ${item_locality}=  Get From Dictionary  ${items[0].deliveryAddress}  locality
-  ${guarantee}=  Get From Dictionary  ${prepared_tender_data}  guarantee
-  ${item_delivery_address_street_address}=  Get From Dictionary  ${items[0].deliveryAddress}  streetAddress
-  ${item_delivery_postal_code}=  Get From Dictionary  ${items[0].deliveryAddress}  postalCode
-  ${cav_id}=           Get From Dictionary   ${items[0].classification}  id
-  ${code}=           Get From Dictionary   ${items[0].unit}          code
-  ${quantity}=      Get From Dictionary   ${items[0]}                        quantity
   ${name}=      Get From Dictionary   ${prepared_tender_data.procuringEntity.contactPoint}       name
   ${dkpp_id}=  Convert To String  1.13
 
@@ -97,33 +93,19 @@ ${bid_number}
   Input text                          id=mForm:guaranteeAmount  ${guarantee_amount}
   Click Element                       id=mForm:guaranteeCurrency_label
   Click Element                       id=mForm:guaranteeCurrency_1
-  Input Text                          id=mForm:dgfDecisionDate_input   01.02.2017
-  Input Text                          id=mForm:dgfDecisionId   123123123
+  ${dgfDecisionDate}=  publicbid_service.convert_date  ${dgfDecisionDate}  %Y-%m-%d  %d.%m.%Y
+  Input Text                          id=mForm:dgfDecisionDate_input   ${dgfDecisionDate}
+  Input Text                          id=mForm:dgfDecisionId   ${dgfDecisionID}
   Input text                          xpath=//*[@id="mForm:dStart_input"]  ${auctionPeriod_start_date}
   Click Element                       xpath=//*[@id="mForm:vat"]/tbody/tr/td[1]/div/div[2]/span
-  Input text                          id=mForm:bidItem_0:subject    ${item_description}
-  Input text                          id=mForm:bidItem_0:cCpv_input   ${cav_id}
-  Wait Until Page Contains Element    xpath=//div[@id='mForm:bidItem_0:cCpv_panel']//td[1]/span   10
-  Click Element                       xpath=//div[@id='mForm:bidItem_0:cCpv_panel']//td[1]/span
-  Input text                          id=mForm:bidItem_0:unit_input    ${code}
-  Wait Until Page Contains Element    xpath=//div[@id='mForm:bidItem_0:unit_panel']//tr/td[1]   10
-  Click Element                       xpath=//div[@id='mForm:bidItem_0:unit_panel']//tr/td[1]
-  Input text                          id=mForm:bidItem_0:amount   ${quantity}
-  Click Element                       xpath=//*[@id="mForm:bidItem_0:cReg"]/div[3]
-  Sleep  1
-  Click Element                       xpath=//ul[@id="mForm:bidItem_0:cReg_items"]/li[text()="м.Київ"]
-  Sleep  1
-  Input Text                       xpath=//*[@id="mForm:bidItem_0:cTer_input"]  ${item_locality}
-  Wait Until Page Contains Element  id=mForm:bidItem_0:cTer_panel  10
-  Click Element                       xpath=//*[@id="mForm:bidItem_0:cTer_panel"]/ul/li[1]
-  Sleep  1
-  Input text                          id=mForm:bidItem_0:zc  ${item_delivery_postal_code}
-  Input text                          xpath=//*[@id="mForm:bidItem_0:delAdr"]  ${item_delivery_address_street_address}
+
+  Додати предмети   ${items}
+
   Input text                          id=mForm:rName    ${name}
   Input text                          id=mForm:rPhone    ${telephone}
   Input text                          id=mForm:rMail   ${mail}
   Sleep  2
-  Run Keyword if   '${mode}' == 'multi'   Додати предмет   items
+
   # Save
   Execute JavaScript  window.scrollTo(0,0)
   Click Element                       xpath=//*[@id="mForm:bSave"]
@@ -165,8 +147,8 @@ ${bid_number}
   Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
   Click Element  id=mForm:docCard:dcType_label
   Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
-  Run Keyword If  '${type}' == 'img'  Click Element  xpath=//*[@id="mForm:docCard:dcType_14"]
-  Run Keyword If  '${type}' == 'doc'  Click Element  xpath=//*[@id="mForm:docCard:dcType_3"]
+  ${doc_type_xpath}=  publicbid_service.get_document_type_xpath  ${type}
+  click element  xpath=${doc_type_xpath}
   Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
   Capture Page Screenshot
   Sleep  5
@@ -188,7 +170,7 @@ ${bid_number}
   Log  ${username}
   Log  ${file}
   Log  ${tender_uaid}
-  Завантажити документ до тендеру  ${file}  img
+  Завантажити документ до тендеру  ${file}  illustration
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[@id="mForm:bSave"]
   wait until element is visible  xpath=//*[text()='Збережено!']  120
@@ -197,20 +179,12 @@ ${bid_number}
 
 Додати Virtual Data Room
   [Arguments]  ${username}  ${tender_uaid}  ${vdr_link}
-  Log  ${username}
-  Log  ${tender_uaid}
-  Log  ${vdr_link}
-  Sleep  5
-  Click Element  xpath=//*[text()='Додати посилання на VDR']
-  Sleep  2
-  Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
-  Click Element  id=mForm:docCard:dcType_label
-  Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
-  Click Element  xpath=//*[@id="mForm:docCard:dcType_1"]
-  Input Text  id=mForm:docCard:fileName  ${vdr_link}
-  Input Text  id=mForm:docCard:extUrl  ${vdr_link}
-  Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
-  Capture Page Screenshot
+  capture page screenshot
+  Додати посилання до тендеру  ${vdr_link}  vdr  Посилання на VDR
+  Execute JavaScript  window.scrollTo(0,0)
+  Click Element  xpath=//*[@id="mForm:bSave"]
+  wait until element is visible  xpath=//*[text()='Збережено!']  120
+  capture page screenshot
   Sleep  5
 
 Set Multi Ids
@@ -220,59 +194,47 @@ Set Multi Ids
   ${id}=           Get Text           id=mForm:nBid
   ${Ids}   Create List    ${tender_UAid}   ${id}
 
-Додати предмет
-  [Arguments]  @{ARGUMENTS}
-  [Documentation]
-  ...      ${ARGUMENTS[0]} ==  items
-  ${dkpp_desc1}=     Get From Dictionary   ${items[1].additionalClassifications[0]}   description
-  ${dkpp_id11}=      Get From Dictionary   ${items[1].additionalClassifications[0]}  id
-  ${dkpp_desc2}=     Get From Dictionary   ${items[2].additionalClassifications[0]}   description
-  ${dkpp_id2}=       Get From Dictionary   ${items[2].additionalClassifications[0]}  id
-  ${dkpp_desc3}=     Get From Dictionary   ${items[3].additionalClassifications[0]}   description
-  ${dkpp_id3}=       Get From Dictionary   ${items[3].additionalClassifications[0]}  id
+Додати предмети
+  [Arguments]  ${items}
+  ${items_count}=  Get Length  ${items}
+  :FOR  ${index}  IN RANGE  ${items_count}
+  \  log  ${items[${index}]}
+  \  Execute JavaScript  window.scrollTo(0,0)
+  \  run keyword if  ${index} != 0  click element    xpath=//span[text()='Додати актив']
+  \  Додати предмет  ${items[${index}]}  ${index}
 
-  Wait Until Page Contains Element   xpath=//button[@class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"]   10
-  Wait Until Page Contains Element   xpath=//button[contains(@class, 'ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only')]   10
-  Wait Until Page Contains Element   xpath=//span[text()="Додати предмет"]   10
-  Click Element                      xpath=//span[text()="Додати предмет"]
-  Wait Until Page Contains Element   id=mForm:subject1   10
-  Input text                         id=mForm:subject1    ${dkpp_desc1}
-  Input text                         id=mForm:cCpv1_input   ${cav_id}
-  Wait Until Page Contains Element   xpath=//div[@id='mForm:cCpv1_panel']/table/tbody/tr/td[1]/span   10
-  Click Element                      xpath=//div[@id='mForm:cCpv1_panel']/table/tbody/tr/td[1]/span
-  Input text                         id=mForm:unit1_input    ${code}
-  Wait Until Page Contains Element   xpath=//div[@id='mForm:unit1_panel']/table/tbody/tr/td[1]   10
-  Click Element                      xpath=//div[@id='mForm:unit1_panel']/table/tbody/tr/td[1]
-  Input text                         id=mForm:amount1   ${quantity}
-  Input text                         id=mForm:cDkpp1_input    ${dkpp_id11}
-  Wait Until Page Contains Element   xpath=//div[@id='mForm:cDkpp1_panel']/table/tbody/tr/td[1]/span   10
-  Click Element                      xpath=//div[@id='mForm:cDkpp1_panel']/table/tbody/tr/td[1]/span
-  Click Element                      xpath=//span[text()="Додати предмет"]
-  Wait Until Page Contains Element   id=mForm:subject2   10
-  Input text                         id=mForm:subject2    ${dkpp_desc2}
-  Input text                         id=mForm:cCpv2_input   ${cav_id}
-  Wait Until Page Contains Element   xpath=//div[@id='mForm:cCpv2_panel']/table/tbody/tr/td[1]/span   10
-  Click Element                      xpath=//div[@id='mForm:cCpv2_panel']/table/tbody/tr/td[1]/span
-  Input text                         id=mForm:unit2_input    ${code}
-  Wait Until Page Contains Element   xpath=//div[@id='mForm:unit2_panel']/table/tbody/tr/td[1]   10
-  Click Element                      xpath=//div[@id='mForm:unit2_panel']/table/tbody/tr/td[1]
-  Input text                         id=mForm:amount2   ${quantity}
-  Input text                         id=mForm:cDkpp2_input    ${dkpp_id2}
-  Wait Until Page Contains Element   xpath=//div[@id='mForm:cDkpp2_panel']/table/tbody/tr/td[1]/span   10
-  Click Element                      xpath=//div[@id='mForm:cDkpp2_panel']/table/tbody/tr/td[1]/span
-  Click Element                      xpath=//span[text()="Додати предмет"]
-  Wait Until Page Contains Element   id=mForm:subject3   10
-  Input text                         id=mForm:subject3    ${dkpp_desc3}
-  Input text                         id=mForm:cCpv3_input   ${cav_id}
-  Wait Until Page Contains Element   xpath=//div[@id='mForm:cCpv3_panel']/table/tbody/tr/td[1]/span   10
-  Click Element                      xpath=//div[@id='mForm:cCpv3_panel']/table/tbody/tr/td[1]/span
-  Input text                         id=mForm:unit3_input    ${code}
-  Wait Until Page Contains Element   xpath=//div[@id='mForm:unit3_panel']/table/tbody/tr/td[1]   10
-  Click Element                      xpath=//div[@id='mForm:unit3_panel']/table/tbody/tr/td[1]
-  Input text                         id=mForm:amount3   ${quantity}
-  Input text                         id=mForm:cDkpp3_input    ${dkpp_id3}
-  Wait Until Page Contains Element   xpath=//div[@id='mForm:cDkpp3_panel']/table/tbody/tr/td[1]/span   10
-  Click Element                      xpath=//div[@id='mForm:cDkpp3_panel']/table/tbody/tr/td[1]/span
+Додати предмет
+  [Arguments]  ${item}  ${index}
+  capture page screenshot
+
+  ${item_description}=  Get From Dictionary  ${item}  description
+  ${item_locality}=  Get From Dictionary  ${item.deliveryAddress}  locality
+  ${item_delivery_address_street_address}=  Get From Dictionary  ${item.deliveryAddress}  streetAddress
+  ${item_delivery_postal_code}=  Get From Dictionary  ${item.deliveryAddress}  postalCode
+  ${cav_id}=           Get From Dictionary   ${item.classification}  id
+  ${code}=           Get From Dictionary   ${item.unit}          code
+  ${quantity}=      Get From Dictionary   ${item}                        quantity
+
+
+  Input text                          id=mForm:bidItem_${index}:subject    ${item_description}
+  Input text                          id=mForm:bidItem_${index}:cCpv_input   ${cav_id}
+  Wait Until Page Contains Element    xpath=//div[@id='mForm:bidItem_${index}:cCpv_panel']//td[1]/span   10
+  Click Element                       xpath=//div[@id='mForm:bidItem_${index}:cCpv_panel']//td[1]/span
+  Input text                          id=mForm:bidItem_${index}:unit_input    ${code}
+  Wait Until Page Contains Element    xpath=//div[@id='mForm:bidItem_${index}:unit_panel']//tr/td[1]   10
+  Click Element                       xpath=//div[@id='mForm:bidItem_${index}:unit_panel']//tr/td[1]
+  Input text                          id=mForm:bidItem_${index}:amount   ${quantity}
+  Click Element                       xpath=//*[@id="mForm:bidItem_${index}:cReg"]/div[3]
+  Sleep  1
+  Click Element                       xpath=//ul[@id="mForm:bidItem_${index}:cReg_items"]/li[text()="м.Київ"]
+  Sleep  1
+  Input Text                       xpath=//*[@id="mForm:bidItem_${index}:cTer_input"]  ${item_locality}
+  Wait Until Page Contains Element  id=mForm:bidItem_${index}:cTer_panel  10
+  Click Element                       xpath=//*[@id="mForm:bidItem_${index}:cTer_panel"]/ul/li[1]
+  Sleep  1
+  Input text                          id=mForm:bidItem_${index}:zc  ${item_delivery_postal_code}
+  Input text                          xpath=//*[@id="mForm:bidItem_${index}:delAdr"]  ${item_delivery_address_street_address}
+
 
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}
@@ -305,76 +267,26 @@ Set Multi Ids
   Log Many  @{ARGUMENTS}
   Switch browser   ${ARGUMENTS[0]}
   Log  ${TENDER['TENDER_UAID']}
-  Run Keyword And Return  Отримати інформацію про ${ARGUMENTS[2]}
-
-Отримати інформацію про value.currency
-  ${return_value}=  Get Text  id=mForm:currency_label
-  ${return_value}=  Convert To String  UAH
-  [Return]  ${return_value}
-
-Отримати інформацію про value.valueAddedTaxIncluded
-  ${return_value}=  Convert To Boolean  True
-  [Return]  ${return_value}
-
-Отримати інформацію про title
-  ${return_value}=   Get Text  xpath=//*[@id="mForm:name"]
-  [Return]  ${return_value}
-
-Отримати інформацію про description
-  ${return_value}=   Get Text  xpath=//*[@id="mForm:desc"]
-  [Return]  ${return_value}
-
-Отримати інформацію про value.amount
-  ${return_value}=   Get Value  xpath=//*[@id="mForm:budget"]
-  Log  ${return_value}
-  ${return_value}=   Convert To Number   ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про auctionID
-  ${return_value}=  Get Text           id=mForm:nBid
-  ${return_value}=  Get Substring  ${return_value}  19
-  ${return_value}=  Convert To String  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про procuringEntity.name
-  ${return_value}=  Get Text           xpath=//*[@id="mForm:orgName"]
-  [Return]  ${return_value}
-
-Отримати інформацію про enquiryPeriod.startDate
-  ${return_value}=  Get Text           xpath=//*[@id="mForm:da"]
-  Fail  "Особливість реалізації, дата початку періоду уточнень = даті оголошення закупівлі"
-  [Return]  ${return_value}
-
-Отримати інформацію про enquiryPeriod.endDate
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:dEPr_input"]
-  ${return_value}=  publicbid_service.parse_date  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про tenderPeriod.startDate
-  ${return_value}=  Get Text           xpath=//*[@id="mForm:da"]
-  ${return_value}=  publicbid_service.parse_date  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про tenderPeriod.endDate
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:dEPr_input"]
-  ${return_value}=  publicbid_service.parse_date  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про minimalStep.amount
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:step"]
-  ${return_value}=  Convert To Number  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про auctionPeriod.startDate
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:dStart_input"]
-  ${return_value}=  publicbid_service.parse_date  ${return_value}
-  [Return]  ${return_value}
+  Run Keyword And Return  view.Отримати інформацію про ${ARGUMENTS[2]}
 
 Отримати інформацію із предмету
   [Arguments]  @{ARGUMENTS}
   Log Many  @{ARGUMENTS}
   ${result}=  Run Keyword If  ${ARGUMENTS[3]} == 'description'  Get Text  xpath=//[@id="mForm:bidItem_0:subject"]
   [Return]  ${result}
+
+Отримати кількість документів в тендері
+  [Arguments]  ${username}  ${tender_uaid}
+  capture page screenshot
+  ${doc_count}=  get matching xpath count  xpath=//div[@id="mForm:pnlFiles"]/div[3]/div/div/table/tbody/tr
+  [Return]  ${doc_count}
+
+Отримати інформацію із документа по індексу
+  [Arguments]  ${username}  ${tender_uaid}  ${index}  ${field}
+  capture page screenshot
+  ${xpath}=  publicbid_service.get_document_field_xpath_by_index  ${index}  ${field}
+  ${document_type}=  Get Text  xpath=${xpath}
+  [Return]  ${document_type}
 
 Внести зміни в тендер
   [Arguments]  ${username}  ${tender_uaid}  ${field}  ${value}
@@ -387,110 +299,6 @@ Set Multi Ids
   Sleep  3
   Click Element              xpath=//*[@id="mForm:bSave"]
   Sleep  3
-
-Отримати інформацію про items[0].description
-  ${return_value}=  Get Text           xpath=//*[@id="mForm:bidItem_0:subject"]
-  [Return]  ${return_value}
-
-Отримати інформацію про items[0].deliveryDate.endDate
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:bidItem_0:item0"]/tbody/tr[5]/td[4]/input
-  ${return_value}=  publicbid_service.parse_item_date  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про items[0].deliveryLocation.latitude
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:bidItem_0:delLoc1"]
-  Run Keyword And Return  Convert To Number  ${return_value}
-
-Отримати інформацію про items[0].deliveryLocation.longitude
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:bidItem_0:delLoc2"]
-  Run Keyword And Return  Convert To Number  ${return_value}
-
-Отримати інформацію про items[0].deliveryAddress.countryName
-  ${return_value}=  Get Text           xpath=//*[@id="mForm:bidItem_0:nState"]
-  ${return_value}=  capitalize_first_letter  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про items[0].deliveryAddress.postalCode
-  ${postal_code_1_exitsts}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[@id="mForm:bidItem_0:zc"]
-  ${postal_code}=  Run Keyword If  ${postal_code_1_exitsts}  Get Value  xpath=//*[@id="mForm:bidItem_0:zc"]
-  ...         ELSE  Get Value  xpath=//*[@id="mForm:bidItem_0:zcText"]
-  [Return]  ${postal_code}
-
-Отримати інформацію про items[0].deliveryAddress.region
-  ${region_1_exitsts}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[@id="mForm:bidItem_0:cReg_label"]
-  ${region}=  Run Keyword If  ${region_1_exitsts}  Get Text  xpath=//*[@id="mForm:bidItem_0:cReg_label"]
-  ...         ELSE  Get Value  xpath=//*[@id="mForm:bidItem_0:cRegText"]
-  [Return]  ${region}
-
-Отримати інформацію про items[0].deliveryAddress.locality
-  ${ter_1_exitsts}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[@id="mForm:bidItem_0:cTer_input"]
-  ${ter}=  Run Keyword If  ${ter_1_exitsts}  Get Value  xpath=//*[@id="mForm:bidItem_0:cTer_input"]
-  ...         ELSE  Get Value  xpath=//*[@id="mForm:bidItem_0:cTerText"]
-  [Return]  ${ter}
-
-Отримати інформацію про items[0].deliveryAddress.streetAddress
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:bidItem_0:delAdr"]
-  [Return]  ${return_value}
-
-Отримати інформацію про items[0].classification.scheme
-  ${return_value}=  Get Text           xpath=//*[@id="mForm:bidItem_0:item0"]/tbody/tr[2]/td/label
-  ${return_value}=  Get Substring  ${return_value}  4  7
-  ${return_value}=  Convert To String  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про items[0].classification.id
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:bidItem_0:cCpv_input"]
-  ${return_value}=  Get Substring  ${return_value}  0  10
-  [Return]  ${return_value}
-
-Отримати інформацію про items[0].classification.description
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:bidItem_0:cCpv_input"]
-  ${return_value}=  Get Substring  ${return_value}  11
-  [Return]  ${return_value}
-
-Отримати інформацію про items[0].additionalClassifications[0].scheme
-  ${return_value}=  Get Text           xpath=//*[@id="mForm:bidItem_0:item0"]/tbody/tr[3]/td[3]/label
-  ${return_value}=  Get Substring  ${return_value}  36  40
-  ${return_value}=  Convert To String  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про items[0].additionalClassifications[0].id
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:bidItem_0:cDkpp_input"]
-  [Return]  ${return_value}
-
-Отримати інформацію про items[0].additionalClassifications[0].description
-  ${return_value}=  Get Text           xpath=//*[@id="mForm:bidItem_0:nDkpp"]
-  ${return_value}=  Strip String  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про items[0].unit.name
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:bidItem_0:unit_input"]
-  ${return_value}=  Get Substring  ${return_value}  4
-  ${return_value}=  Convert To String  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про items[0].unit.code
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:bidItem_0:unit_input"]
-  ${return_value}=  Get Substring  ${return_value}  0  3
-  ${return_value}=  Convert To String  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про items[0].quantity
-  ${return_value}=  Get Value           xpath=//*[@id="mForm:bidItem_0:amount"]
-  ${return_value}=  Convert To Number  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про status
-  Capture Page Screenshot
-  Reload Page
-  ${return_value}=  Get Text  xpath=//*[@id="mForm:status"]
-  ${return_value}=  get_tender_code  ${return_value}
-  ${return_value}=  Convert To String  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про dgfID
-  ${return_value}=  Get Text  id=mForm:dgfID
-  [Return]  ${return_value}
 
 
 Задати питання
@@ -522,39 +330,6 @@ Set Multi Ids
   ...      ${ARGUMENTS[1]} =  ${TENDER_UAID}
   Switch Browser    ${ARGUMENTS[0]}
   publicbid.Пошук тендера по ідентифікатору    ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
-
-Отримати інформацію про questions[${index}].title
-  Click Element  xpath=//*[text()="Обговорення"]
-  Sleep  5
-  Capture Page Screenshot
-  ${return_value}=  Get Text  id=mForm:data:${index}:title
-  [Return]  ${return_value}
-
-Отримати інформацію про questions[${index}].description
-  Capture Page Screenshot
-  ${xpath}=  publicbid_service.get_question_answer_by_type_xpath  question  ${index}
-  ${return_value}=  Get Text  xpath=${xpath}
-  [Return]  ${return_value}
-
-Отримати інформацію про questions[${index}].date
-  ${return_value}=  Get Text  xpath=//*[@id="mForm:data_data"]/tr/td[4]
-  ${return_value}=  publicbid_service.parse_date  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про questions[${index}].answer
-  capture page screenshot
-  Click Element  xpath=//*[text()="Обговорення"]
-  Sleep  5
-  capture page screenshot
-  ${xpath}=  get_question_answer_by_type_xpath  answer  ${index}
-  ${return_value}=  Get Text  xpath=${xpath}
-  [Return]  ${return_value}
-
-Отримати інформацію про auctionPeriod.endDate
-  Capture Page Screenshot
-  ${return_value}=  Get Text  xpath=//*[@id="mForm:auctionEndDate"]
-  ${return_value}=  publicbid_service.parse date  ${return_value}
-  [Return]  ${return_value}
 
 Подати цінову пропозицію
   [Arguments]  ${username}  ${tender_uaid}  ${bid_data}
@@ -805,36 +580,20 @@ Set Multi Ids
   Wait Until Page Contains Element  id=infoBar  30
   Sleep  3
 
-Отримати інформацію про cancellations[0].status
-  Capture Page Screenshot
-  Reload Page
-  Click Element  id=mForm:cancellation-reason-lnk
-  Wait Until Page Contains Element  id=mForm:cStatus  10
-  ${return_value}=  Get Text  id=mForm:cStatus
-  ${return_value}=  get_cancellation_code  ${return_value}
-  ${return_value}=  Convert To String  ${return_value}
-  [Return]  ${return_value}
-
-Отримати інформацію про cancellations[0].reason
-  Capture Page Screenshot
-  Click Element  id=mForm:cancellation-reason-lnk
-  wait until page contains element  id=mForm:cReason-txt  10
-  ${return_value}=  Get Text  id=mForm:cReason-txt
-  [Return]  ${return_value}
 
 Отримати інформацію із документа
   [Arguments]  ${username}  ${tender_uaid}  ${document_id}  ${field}
   Reload Page
   Capture Page Screenshot
   publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-  ${field_xpath}=  get_document_field_xpath  ${field}  ${document_id}
+  ${field_xpath}=  publicbid_service.get_document_field_xpath_by_id  ${field}  ${document_id}
   ${return_value}=  Get Text  xpath=${field_xpath}
   ${return_value}=  Convert To String  ${return_value}
   [Return]  ${return_value}
 
 Отримати документ
   [Arguments]  ${username}  ${tender_uaid}  ${doc_id}
-  ${field_xpath}=  get_document_field_xpath  title  ${doc_id}
+  ${field_xpath}=  publicbid_service.get_document_field_xpath_by_id  title  ${doc_id}
   ${url}=  Get Element Attribute  xpath=${field_xpath}@href
   ${return_value}=  Get Text  xpath=${field_xpath}
   ${return_value}=  Convert To String  ${return_value}
@@ -864,11 +623,6 @@ Set Multi Ids
   Input Text  id=mForm:messQ  ${answer_data.data.answer}
   Click Element  id=mForm:btnR
   Capture Page Screenshot
-
-
-Отримати інформацію про eligibilityCriteria
-  Capture Page Screenshot
-
 
 Скасування рішення кваліфікаційної комісії
   [Arguments]  ${username}  ${tender_uaid}  ${index}
@@ -1079,4 +833,44 @@ Set Multi Ids
   Sleep  5
   Switch Browser  ${username}
 
+Додати публічний паспорт активу
+  [Arguments]  ${username}  ${tender_uaid}  ${doc}
+  capture page screenshot
+  Додати посилання до тендеру  ${doc}  x_dgfPublicAssetCertificate  Посилання на Публічний Паспорт Активу
+  Execute JavaScript  window.scrollTo(0,0)
+  Click Element  xpath=//*[@id="mForm:bSave"]
+  wait until element is visible  xpath=//*[text()='Збережено!']  120
+  capture page screenshot
+  Sleep  5
 
+
+Завантажити документ в тендер з типом
+  [Arguments]  ${username}  ${tender_uaid}  ${doc}  ${doc_type}
+  Завантажити документ до тендеру  ${doc}  ${doc_type}
+  Execute JavaScript  window.scrollTo(0,0)
+  Click Element  xpath=//*[@id="mForm:bSave"]
+  wait until element is visible  xpath=//*[text()='Збережено!']  120
+  capture page screenshot
+  Sleep  5
+
+Додати офлайн документ
+  [Arguments]  ${username}  ${tender_uaid}  ${doc}
+  capture page screenshot
+  fail
+
+Додати посилання до тендеру
+  [Arguments]  ${link}  ${doc_type}  ${name}
+  click element  xpath=//span[text()='Додати посилання']
+  sleep  3
+  capture page screenshot
+  wait until page contains element  id=mForm:docCard:extUrl  10
+  ${doc_type_xpath}=  publicbid_service.get_document_link_type_xpath  ${doc_type}
+  click element  id=mForm:docCard:dcType_label
+  wait until page contains element  xpath=${doc_type_xpath}  10
+  click element  xpath=${doc_type_xpath}
+  input text  id=mForm:docCard:fileName  ${name}
+  input text  id=mForm:docCard:extUrl  ${link}
+  capture page screenshot
+  click element  id=mForm:docCard:dc-save-btn
+  sleep  2
+  capture page screenshot
