@@ -236,7 +236,7 @@ Library  publicbid_service.py
   [Return]  ${return_value}
 
 Отримати інформацію про tenderAttempts
-  ${return_value}=  Get Text  id=tenderAttempts
+  ${return_value}=  Get Text  id=mForm:tenderAttempts_label
   [Return]  ${return_value}
 
 Отримати інформацію про procurementMethodType
