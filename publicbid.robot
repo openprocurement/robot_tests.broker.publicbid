@@ -68,6 +68,7 @@ ${bid_number}
   ${countryName}=   Get From Dictionary   ${prepared_tender_data.procuringEntity.address}       countryName
   ${name}=      Get From Dictionary   ${prepared_tender_data.procuringEntity.contactPoint}       name
   ${dkpp_id}=  Convert To String  1.13
+  ${tenderAttemptXpath}=  publicbid_service.get_tender_attempts_xpath  ${prepared_tender_data}
 
   Switch Browser     ${ARGUMENTS[0]}
   Wait Until Page Contains Element    xpath=//*[text()='ОГОЛОСИТИ ЕЛЕКТРОННІ ТОРГИ']   10
@@ -86,6 +87,8 @@ ${bid_number}
   Input Text  id=mForm:dgfID  ${dgfID}
   Input text                          id=mForm:name     ${title}
   Input text                          id=mForm:desc     ${description}
+  click element  id=mForm:tenderAttempts_label
+  click element  xpath=${tenderAttemptXpath}
   Input text                          id=mForm:budget   ${budget}
   Sleep  7
   Input text                          id=mForm:step     ${step_rate}

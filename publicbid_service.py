@@ -178,3 +178,16 @@ def get_document_link_type_xpath(doc_type):
         "vdr": "//li[@id='mForm:docCard:dcType_2']"
     }
     return doc_link_type_xpath[doc_type]
+
+
+def get_tender_attempts_xpath(tender_data):
+    values = {
+        1: "//*[@id='mForm:tenderAttempts_1']",
+        2: "//*[@id='mForm:tenderAttempts_2']",
+        3: "//*[@id='mForm:tenderAttempts_3']",
+        4: "//*[@id='mForm:tenderAttempts_4']"
+    }
+    if 'tenderAttempts' not in tender_data:
+        return "//*[@id='mForm:tenderAttempts_0']"
+    else:
+        return values[tender_data['tenderAttempts']]
