@@ -191,3 +191,17 @@ def get_tender_attempts_xpath(tender_data):
         return "//*[@id='mForm:tenderAttempts_0']"
     else:
         return values[tender_data['tenderAttempts']]
+
+
+def get_document_type(key):
+    values = {
+        "Юридична Інформація Майданчиків": "x_dgfPlatformLegalDetails"
+    }
+    return values.get(unicode(key).encode('utf-8'), '')
+
+
+def get_tender_attempts(key):
+    values = {
+        "Лот виставляється вперше": 1
+    }
+    return values.get(unicode(key).encode('utf-8'), None)

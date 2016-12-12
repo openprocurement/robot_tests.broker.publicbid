@@ -202,12 +202,12 @@ Set Multi Ids
   ${items_count}=  Get Length  ${items}
   :FOR  ${index}  IN RANGE  ${items_count}
   \  log  ${items[${index}]}
-  \  Execute JavaScript  window.scrollTo(0,0)
-  \  run keyword if  ${index} != 0  click element    xpath=//span[text()='Додати актив']
   \  Додати предмет  ${items[${index}]}  ${index}
 
 Додати предмет
   [Arguments]  ${item}  ${index}
+  Execute JavaScript  window.scrollTo(0,0)
+  run keyword if  ${index} != 0  click element    xpath=//span[text()='Додати актив']
   capture page screenshot
 
   ${item_description}=  Get From Dictionary  ${item}  description
@@ -238,6 +238,25 @@ Set Multi Ids
   Input text                          id=mForm:bidItem_${index}:zc  ${item_delivery_postal_code}
   Input text                          xpath=//*[@id="mForm:bidItem_${index}:delAdr"]  ${item_delivery_address_street_address}
 
+Додати предмет закупівлі
+  [Arguments]  ${username}  ${tender_uaid}  ${item}
+  ${tender_status}=  get text  id=mForm:status
+  Return From Keyword If  '${tender_status}' == 'Очікування пропозицій'
+  ${items_count}=  publicbid.Отримати кількість предметів в тендері  ${username}  ${tender_uaid}
+  publicbid.Додати предмет  ${item}  ${items_count}
+
+Видалити предмет закупівлі
+  [Arguments]  ${username}  ${tender_uaid}  ${item_id}
+  ${tender_status}=  get text  id=mForm:status
+  Return From Keyword If  '${tender_status}' == 'Очікування пропозицій'
+  click element  xpath=//textarea[contains(text(), '${item_id}')]/ancestor::tbody[1]/tr[1]/td[3]/button
+  sleep  5
+
+Отримати кількість предметів в тендері
+  [Arguments]  ${username}  ${tender_uaid}
+  capture page screenshot
+  ${itewms_count}=  get matching xpath count  xpath=//div[@id='mForm:itemsData']/table
+  [Return]  ${itewms_count}
 
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}
@@ -261,6 +280,7 @@ Set Multi Ids
   \  Input Text   id=mForm:search-by-number-input  ${tender_uaid}
   \  Press Key  id=mForm:search-by-number-input  \\13
   \  Sleep  5
+  Sleep  1
   Click Element    xpath=//p[contains(text(), '${tender_uaid}')]/ancestor::div[1]/span[2]/a
   Wait Until Page Contains Element  id=mForm:nBid  30
   Capture Page Screenshot
@@ -289,6 +309,7 @@ Set Multi Ids
   capture page screenshot
   ${xpath}=  publicbid_service.get_document_field_xpath_by_index  ${index}  ${field}
   ${document_type}=  Get Text  xpath=${xpath}
+  ${document_type}=  publicbid_service.get_document_type  ${document_type}
   [Return]  ${document_type}
 
 Внести зміни в тендер
@@ -840,6 +861,7 @@ Set Multi Ids
   [Arguments]  ${username}  ${tender_uaid}  ${doc}
   capture page screenshot
   Додати посилання до тендеру  ${doc}  x_dgfPublicAssetCertificate  Посилання на Публічний Паспорт Активу
+  capture page screenshot
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[@id="mForm:bSave"]
   wait until element is visible  xpath=//*[text()='Збережено!']  120
@@ -850,7 +872,9 @@ Set Multi Ids
 Завантажити документ в тендер з типом
   [Arguments]  ${username}  ${tender_uaid}  ${doc}  ${doc_type}
   Завантажити документ до тендеру  ${doc}  ${doc_type}
+  capture page screenshot
   Execute JavaScript  window.scrollTo(0,0)
+  capture page screenshot
   Click Element  xpath=//*[@id="mForm:bSave"]
   wait until element is visible  xpath=//*[text()='Збережено!']  120
   capture page screenshot
@@ -859,7 +883,20 @@ Set Multi Ids
 Додати офлайн документ
   [Arguments]  ${username}  ${tender_uaid}  ${doc}
   capture page screenshot
-  fail
+  click element  id=mForm:add-asset-familiarization-btn
+  sleep  3
+  click element  id=mForm:docCard:dcType_label
+  click element  id=mForm:docCard:dcType_1
+  input text  id=mForm:docCard:fileName  Порядок ознайомлення з активом у кімнаті даних
+  input text  id=mForm:docCard:accessDetails  ${doc}
+  click element  id=mForm:docCard:dc-save-btn
+  sleep  3
+  Execute JavaScript  window.scrollTo(0,0)
+  capture page screenshot
+  Click Element  xpath=//*[@id="mForm:bSave"]
+  wait until element is visible  xpath=//*[text()='Збережено!']  120
+  capture page screenshot
+  Sleep  5
 
 Додати посилання до тендеру
   [Arguments]  ${link}  ${doc_type}  ${name}
