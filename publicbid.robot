@@ -716,12 +716,12 @@ Set Multi Ids
   ...  ELSE  Set Variable  mForm:data:${index}:rate-contract-sign-btn
   click element  id=${button_id}
   Sleep  15
-  ${auction_protocol_loaded}=  run keyword and return status  page should contain element  id=mForm:proposalDocuments:dg-data-table_data
+  ${auction_protocol_loaded}=  run keyword and return status  page should contain element  xpath=//span[text()='Протокол аукціону']
   :FOR    ${INDEX}    IN RANGE    1    25
   \  capture page screenshot
   \  Exit For Loop If  ${auction_protocol_loaded} == True
   \  Sleep  3
-  \  ${auction_protocol_loaded}=  run keyword and return status  page should contain element  id=mForm:proposalDocuments:dg-data-table_data
+  \  ${auction_protocol_loaded}=  run keyword and return status  page should contain element  xpath=//span[text()='Протокол аукціону']
   \  Run Keyword If  ${auction_protocol_loaded} == False  Sleep  15
   \  Run Keyword If  ${auction_protocol_loaded} == False  Reload Page
   \  capture page screenshot
