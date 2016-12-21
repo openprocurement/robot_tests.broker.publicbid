@@ -24,7 +24,7 @@ def get_tender_code(key):
 
 def get_tender_type(key):
     tender_types = {
-        "Майно банків": "dgfOther",
+        "Майно банків": "dgfOtherAssets",
         "Права вимоги": "dgfFinancialAssets"
     }
     return tender_types[unicode(key).encode('utf-8')]

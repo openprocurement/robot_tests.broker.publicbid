@@ -384,7 +384,7 @@ Set Multi Ids
   Sleep  2
   Click Element  xpath=//*[@id="mForm:proposalSaveInfo"]/div[3]/button
   Sleep  2
-  ${is_qualified}=  publicbid_service.is_qualified  ${bid_data}
+  ${is_qualified}=  Get From Dictionary  ${bid_data.data}  qualified
   Run Keyword If  ${is_qualified} == False
   ...  Змінити кваліфікацію пропозиції  ${username}  ${tender_uaid}  ${False}
   reload page
@@ -912,5 +912,5 @@ Set Multi Ids
   input text  id=mForm:docCard:extUrl  ${link}
   capture page screenshot
   click element  id=mForm:docCard:dc-save-btn
-  sleep  2
+  sleep  5
   capture page screenshot
