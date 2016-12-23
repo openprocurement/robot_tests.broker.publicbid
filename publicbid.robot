@@ -36,9 +36,9 @@ ${bid_number}
   Run Keyword And Ignore Error   Wait Until Page Contains Element    xpath=//*[text()='Вхід']   10
   Click Element                      xpath=//*[text()='Вхід']
   Run Keyword And Ignore Error   Wait Until Page Contains Element   id=mForm:email   10
-  Input text   id=mForm:email      ${USERS.users['${username}'].Login}
+  Input text   id=mForm:email      ${USERS.users['${username}'].login}
   Input text   id=mForm:pwd      ${USERS.users['${username}'].password}
-  Click Button   id=mForm:Login
+  Click Button   id=mForm:login
   Sleep  3
   ${present}=  Run Keyword And Return Status    Element Should Be Visible   id=mForm:existNotResolvedQuestionsOrAppealsDiaLog
   Run Keyword If  ${present}  Click Element  xpath=//*[@id='mForm:existNotResolvedQuestionsOrAppealsDiaLog']/div[3]/a
@@ -844,7 +844,7 @@ Set Multi Ids
   Run Keyword And Ignore Error   Wait Until Page Contains Element   id=mForm:email   10
   Input text   id=mForm:email      test_eauction@yopmail.com
   Input text   id=mForm:pwd      P@ssw0rd
-  Click Button   id=mForm:Login
+  Click Button   id=mForm:login
   Sleep  3
   ${present}=  Run Keyword And Return Status    Element Should Be Visible   id=mForm:existNotResolvedQuestionsOrAppealsDiaLog
   Run Keyword If  ${present}  Click Element  xpath=//*[@id='mForm:existNotResolvedQuestionsOrAppealsDiaLog']/div[3]/a
