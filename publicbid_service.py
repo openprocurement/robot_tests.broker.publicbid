@@ -9,31 +9,40 @@ from robot.libraries.BuiltIn import BuiltIn
 
 TZ = pytz.timezone('Europe/Kiev')
 
-tenderCodes = {
-    "Період аукціону": "active.auction",
-    "Очікування пропозицій": "active.tendering",
-    "Кваліфікація переможця": "active.qualification",
-    "Аукціон не відбувся": "unsuccessful",
-    "Відмінений аукціон": "cancelled",
-    "Завершений аукціон": "complete"
-}
-
-cancellationCodes = {
-    "Скасування активоване": "active"
-}
-
-proposalDocumentTypes = {
-    "Протокол аукціону": "auctionProtocol",
-    "Ліцензія": "license"
-}
-
 
 def get_tender_code(key):
-    return tenderCodes[unicode(key).encode('utf-8')]
+    tender_status_codes = {
+        "Період аукціону": "active.auction",
+        "Очікування пропозицій": "active.tendering",
+        "Кваліфікація переможця": "active.qualification",
+        "Аукціон не відбувся": "unsuccessful",
+        "Відмінений аукціон": "cancelled",
+        "Завершений аукціон": "complete"
+    }
+    return tender_status_codes[unicode(key).encode('utf-8')]
+
+
+def get_tender_type(key):
+    tender_types = {
+        "Майно банків": "dgfOtherAssets",
+        "Права вимоги": "dgfFinancialAssets"
+    }
+    return tender_types[unicode(key).encode('utf-8')]
 
 
 def get_cancellation_code(key):
-    return cancellationCodes[unicode(key).encode('utf-8')]
+    cancellation_codes = {
+        "Скасування активоване": "active"
+    }
+    return cancellation_codes[unicode(key).encode('utf-8')]
+
+
+def convert_date(date_str, from_pattern, to_pattern):
+    date_str = datetime.strptime(date_str, from_pattern)
+    date = datetime(date_str.year, date_str.month, date_str.day, date_str.hour, date_str.minute, date_str.second,
+                    date_str.microsecond)
+    return_date = date.strftime(to_pattern)
+    return return_date
 
 
 def parse_date(date_str):
@@ -89,7 +98,7 @@ def get_field_value(field_id, field_value):
     return values[field_id]
 
 
-def get_document_field_xpath(field_id, document_id):
+def get_document_field_xpath_by_id(field_id, document_id):
     values = {
         'title': "//a[contains(text(), '" + document_id + "')]",
         'description': "//a[contains(text(), '" + document_id + "')]/ancestor::tr[1]/td[3]/span"
@@ -97,8 +106,19 @@ def get_document_field_xpath(field_id, document_id):
     return values[field_id]
 
 
+def get_document_field_xpath_by_index(index, field):
+    values = {
+        "documentType": "//div[@id='mForm:pnlFiles']/div[3]/div/div/table/tbody/tr[@data-ri='" + str(index) + "']/td[2]/span"
+    }
+    return values[field]
+
+
 def get_proposal_document_type(key):
-    return proposalDocumentTypes[unicode(key).encode('utf-8')]
+    proposal_document_types = {
+        "Протокол аукціону": "auctionProtocol",
+        "Ліцензія": "license"
+    }
+    return proposal_document_types[unicode(key).encode('utf-8')]
 
 
 def is_qualified(bid_data):
@@ -138,3 +158,50 @@ def get_question_answer_by_type_xpath(question_type, index):
 def download_file(url, file_name):
     output_dir = BuiltIn().get_variable_value("${OUTPUT_DIR}")
     urllib.urlretrieve(url, os.path.join(output_dir, file_name))
+
+
+def get_document_type_xpath(doc_type):
+    doc_type_xpath = {
+        "illustration": "//*[@id='mForm:docCard:dcType_1']",
+        "doc": "//*[@id='mForm:docCard:dcType_3']",
+        "tenderNotice": "//*[@id='mForm:docCard:dcType_4']",
+        "x_presentation": "//*[@id='mForm:docCard:dcType_3']",
+        "technicalSpecifications": "//*[@id='mForm:docCard:dcType_2']",
+        "x_nda": "//*[@id='mForm:docCard:dcType_5']"
+    }
+    return doc_type_xpath[doc_type]
+
+
+def get_document_link_type_xpath(doc_type):
+    doc_link_type_xpath = {
+        "x_dgfPublicAssetCertificate": "//li[@id='mForm:docCard:dcType_1']",
+        "vdr": "//li[@id='mForm:docCard:dcType_2']"
+    }
+    return doc_link_type_xpath[doc_type]
+
+
+def get_tender_attempts_xpath(tender_data):
+    values = {
+        1: "//*[@id='mForm:tenderAttempts_1']",
+        2: "//*[@id='mForm:tenderAttempts_2']",
+        3: "//*[@id='mForm:tenderAttempts_3']",
+        4: "//*[@id='mForm:tenderAttempts_4']"
+    }
+    if 'tenderAttempts' not in tender_data:
+        return "//*[@id='mForm:tenderAttempts_0']"
+    else:
+        return values[tender_data['tenderAttempts']]
+
+
+def get_document_type(key):
+    values = {
+        "Юридична Інформація Майданчиків": "x_dgfPlatformLegalDetails"
+    }
+    return values.get(unicode(key).encode('utf-8'), '')
+
+
+def get_tender_attempts(key):
+    values = {
+        "Лот виставляється вперше": 1
+    }
+    return values.get(unicode(key).encode('utf-8'), None)
