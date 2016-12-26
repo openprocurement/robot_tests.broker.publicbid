@@ -120,7 +120,7 @@ ${bid_number}
   Click Element                       xpath=//span[text()="ОГОЛОСИТИ ТОРГИ У ТЕСТОВОМУ РЕЖИМІ"]
   Sleep   2
   # Confirm in message box
-  Click Element                       xpath=//div[contains(@class, "ui-confirm-diaLog") and @aria-hidden="false"]//span[text()="Оголосити"]
+  Click Element                       xpath=//div[contains(@class, "ui-confirm-dialog") and @aria-hidden="false"]//span[text()="Оголосити"]
   Sleep   5
   Click Element                       xpath=//span[contains(@class, "ui-button-text ui-c") and text()="Так"]
   # More smart wait for id is needed there.
