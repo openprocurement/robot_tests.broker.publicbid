@@ -199,9 +199,3 @@ def get_document_type(key):
     }
     return values.get(unicode(key).encode('utf-8'), '')
 
-
-def get_tender_attempts(key):
-    values = {
-        "Лот виставляється вперше": 1
-    }
-    return values.get(unicode(key).encode('utf-8'), None)
