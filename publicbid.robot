@@ -112,7 +112,7 @@ ${bid_number}
   # Save
   Execute JavaScript  window.scrollTo(0,0)
   Click Element                       xpath=//*[@id="mForm:bSave"]
-  Wait Until Element Is Visible  id=notifyBar  60
+  Wait Until Element Is Visible  id=notifyBar  70
   Sleep  3
   Click Element                       xpath=//*[@id="mForm:needAnnounce"]/div[3]/button/span
   Sleep   5
@@ -164,7 +164,7 @@ ${bid_number}
   Завантажити документ до тендеру  ${file}  doc
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[@id="mForm:bSave"]
-  Wait Until Element Is Visible  xpath=//*[text()='Збережено!']  120
+  Wait Until Element Is Visible  xpath=//*[text()='Збережено!']  40
   Capture Page Screenshot
   Sleep  5
 
@@ -176,7 +176,7 @@ ${bid_number}
   Завантажити документ до тендеру  ${file}  illustration
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[@id="mForm:bSave"]
-  Wait Until Element Is Visible  xpath=//*[text()='Збережено!']  120
+  Wait Until Element Is Visible  xpath=//*[text()='Збережено!']  40
   Capture Page Screenshot
   Sleep  5
 
@@ -186,7 +186,7 @@ ${bid_number}
   Додати посилання до тендеру  ${vdr_link}  vdr  Посилання на VDR
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[@id="mForm:bSave"]
-  Wait Until Element Is Visible  xpath=//*[text()='Збережено!']  120
+  Wait Until Element Is Visible  xpath=//*[text()='Збережено!']  40
   Capture Page Screenshot
   Sleep  5
 
@@ -266,7 +266,7 @@ Set Multi Ids
   Click Element  xpath=//a[./text()="Електронні торги"]
   Wait Until Page Contains Element    id=mForm:search_button   10
   Click Element  xpath=//*[text()='Переглянути тестові електронні торги']
-  Wait Until Page Contains Element  xpath=//*[text()='ТЕСТОВИЙ РЕЖИМ']  60
+  Wait Until Page Contains Element  xpath=//*[text()='ТЕСТОВИЙ РЕЖИМ']  40
   Click Element  xpath=//*[@id="buttons"]/button[4]
   Wait Until Page Contains Element  id=mForm:search-by-number-input  3
   Input Text   id=mForm:search-by-number-input  ${tender_uaid}
@@ -381,7 +381,7 @@ Set Multi Ids
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[text()='Зберегти']
   Wait Until Page Contains Element  xpath=//*[@id="mForm:proposalSaveInfo"]/div[3]/button  10
-  Sleep  2
+  Sleep  5
   Click Element  xpath=//*[@id="mForm:proposalSaveInfo"]/div[3]/button
   Sleep  2
   ${is_qualified}=  Get From Dictionary  ${bid_data.data}  qualified
