@@ -4,6 +4,7 @@ Library  String
 Library  DateTime
 Library  publicbid_json_util.py
 Library  publicbid_service.py
+Resource  publicbid.robot
 
 *** Keywords ***
 Отримати інформацію про value.currency
@@ -243,3 +244,21 @@ Library  publicbid_service.py
   ${return_value}=  Get Text  id=mForm:procurementMethodName
   ${return_value}=  publicbid_service.get_tender_type  ${return_value}
   [Return]  ${return_value}
+
+Отримати інформацію про awards[0].status
+  Run Keyword if    '${TEST NAME}' == 'Відображення статусу 'очікується протокол' для першого кандидата'    Потрапити на сторінку результатів аукціону
+  ${return_value}=  Get Text    xpath=//*[@id='mForm:data_data']/tr[1]/td[5]
+  ${return_value}=  publicbid_service.get_awards_status  ${return_value}
+  [Return]  ${return_value}
+
+Отримати інформацію про awards[1].status
+  ${return_value}=  Get Text    xpath=//*[@id='mForm:data_data']/tr[2]/td[5]
+  ${return_value}=  publicbid_service.get_awards_status  ${return_value}
+  [Return]  ${return_value}
+
+
+
+
+
+
+
