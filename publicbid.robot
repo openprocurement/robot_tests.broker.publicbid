@@ -112,7 +112,7 @@ ${bid_number}
   # Save
   Execute JavaScript  window.scrollTo(0,0)
   Click Element                       xpath=//*[@id="mForm:bSave"]
-  Wait Until Element Is Visible  id=notifyBar  70
+  Wait Until Element Is Visible  id=notifyBar  120
   Sleep  3
   Click Element                       xpath=//*[@id="mForm:needAnnounce"]/div[3]/button/span
   Sleep   5
@@ -914,3 +914,25 @@ Set Multi Ids
   Click Element  id=mForm:docCard:dc-save-btn
   Sleep  5
   Capture Page Screenshot
+
+Потрапити на сторінку результатів аукціону
+  Wait until page contains element    id=mForm:auction-results-btn    10
+  Click Element    id=mForm:auction-results-btn
+  Wait until page contains element    id=mForm:mForm:auctions-bidders-btn    10
+  Click Element    id=mForm:mForm:auctions-bidders-btn
+
+Завантажити протокол аукціону в авард
+  [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${award_index}
+  Wait Until Page Contains Element  id=mForm:auction-results-btn  10
+  Click Element  id=mForm:auction-results-btn
+  Wait Until Page Contains Element  id=mForm:mForm:auctions-bidders-btn  10
+  Click Element  id=mForm:mForm:auctions-bidders-btn
+  Click Element  xpath=//*[@id='mForm:data:0:rate-btn']
+
+
+Підтвердити наявність протоколу аукціону
+  [Arguments]  ${username}  ${tender_uaid}  ${award_index}
+  Wait Until Page Contains Element  id=mForm:auction-results-btn  10
+  Click Element  id=mForm:auction-results-btn
+  Wait Until Page Contains Element  id=mForm:mForm:auctions-bidders-btn  10
+  Click Element  id=mForm:mForm:auctions-bidders-btn

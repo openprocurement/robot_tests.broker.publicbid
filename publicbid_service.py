@@ -22,6 +22,18 @@ def get_tender_code(key):
     return tender_status_codes[unicode(key).encode('utf-8')]
 
 
+def get_awards_status(key):
+    award_status = {
+        "Очікується завантаження протоколу": "pending.verification",
+        "Очікування кваліфікації переможця": "pending.waiting",
+        "Очікується підписання договору": "pending.payment",
+        "Оплачено, очікується підписання договору": "active",
+        "Скасовано": "cancelled",
+        "Дискваліфіковано" : "unsuccessful"
+    }
+    return award_status[unicode(key).encode('utf-8')]    
+
+
 def get_tender_type(key):
     tender_types = {
         "Майно банків": "dgfOtherAssets",
