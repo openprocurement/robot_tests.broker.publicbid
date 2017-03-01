@@ -26,10 +26,10 @@ def get_awards_status(key):
     award_status = {
         "Очікується завантаження протоколу": "pending.verification",
         "Очікування кваліфікації переможця": "pending.waiting",
-        "Очікується підписання договору": "pending.payment",
-        "Оплачено, очікується підписання договору": "active",
+        "Очікується оплата": "pending.payment",
+        "Визнано переможцем": "active",
         "Скасовано": "cancelled",
-        "Дискваліфіковано" : "unsuccessful"
+        "Відхилено" : "unsuccessful"
     }
     return award_status[unicode(key).encode('utf-8')]    
 
