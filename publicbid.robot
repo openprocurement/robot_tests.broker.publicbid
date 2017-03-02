@@ -83,6 +83,8 @@ ${bid_number}
   ...             ELSE  Click Element  id=mForm:procurementType_1
   Sleep  3
   Click Element                       id=mForm:chooseProcurementTypeBtn
+  Sleep  5
+  Click Element                       id=mForm:j_idt91:j_idt94
   Wait Until Page Contains Element    id=mForm:name  10
   Input Text                          id=mForm:dgfID  ${dgfID}
   Input text                          id=mForm:name     ${title}
@@ -923,16 +925,32 @@ Set Multi Ids
 
 Завантажити протокол аукціону в авард
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${award_index}
-  Wait Until Page Contains Element  id=mForm:auction-results-btn  10
-  Click Element  id=mForm:auction-results-btn
-  Wait Until Page Contains Element  id=mForm:mForm:auctions-bidders-btn  10
-  Click Element  id=mForm:mForm:auctions-bidders-btn
-  Click Element  xpath=//*[@id='mForm:data:0:rate-btn']
+  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  publicbid.Потрапити на сторінку результатів аукціону
+  ${award_count}=  Get Matching Xpath Count  xpath=//*[@id="mForm:data_data"]/tr
+  ${award_index}=  publicbid_service.get_award_index  ${award_index}  ${award_count}
+  Click Element  xpath=//*[@id='mForm:data:${award_index}:rate-btn']
+  Choose File    xpath=//*[@id='mForm:tdFile_input']    ${filepath}
+  Sleep  5
+  Click Element  id=mForm:docCard:dcType_label
+  Sleep  2
+  Click Element  xpath=//*[@id='mForm:docCard:dcType_5']
+  Sleep  2
+  Click Element  id=mForm:docCard:dc-save-btn
+  Sleep  2
+  Click Element  id=mForm:save-btn
 
 
 Підтвердити наявність протоколу аукціону
   [Arguments]  ${username}  ${tender_uaid}  ${award_index}
-  Wait Until Page Contains Element  id=mForm:auction-results-btn  10
-  Click Element  id=mForm:auction-results-btn
-  Wait Until Page Contains Element  id=mForm:mForm:auctions-bidders-btn  10
-  Click Element  id=mForm:mForm:auctions-bidders-btn
+  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  publicbid.Потрапити на сторінку результатів аукціону
+  ${award_count}=  Get Matching Xpath Count  xpath=//*[@id="mForm:data_data"]/tr
+  ${award_index}=  publicbid_service.get_award_index  ${award_index}  ${award_count}
+  Click Element  xpath=//*[@id='mForm:data:${award_index}:rate-btn']
+  Sleep  3
+  Click Element  id=mForm:j_idt143
+  Sleep  3
+  Click Element  id=mForm:save-btn
+  Sleep  3
+  Click Element  id=mForm:bRS
