@@ -752,7 +752,12 @@ Set Multi Ids
   Log  ${index}
   Log  ${description}
   Capture Page Screenshot
-  Click Element  id=mForm:bD
+  Run Keyword If  '${TEST NAME}' == 'Можливість дискваліфікувати першого кандидата'  publicbid.Потрапити на сторінку кваліфікації кандидата  ${username}  ${tender_uaid}  ${index}
+  Run Keyword If  '${TEST NAME}' == 'Можливість дискваліфікувати другого кандидата'  publicbid.Потрапити на сторінку кваліфікації кандидата  ${username}  ${tender_uaid}  ${index}
+  ${status_award1}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[@id="mForm:bDc"]
+  Run Keyword If  ${status_award1} == True  Click Element  xpath=//*[@id="mForm:bDc"]
+  ${status_award2}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[@id="mForm:bD"]
+  Run Keyword If  ${status_award2} == True  Click Element  xpath=//*[@id="mForm:bD"]
   Wait Until Page COntains Element  id=mForm:cdDisqualif-yes-btn  10
   Click Element  id=mForm:cdDisqualif-yes-btn
   Sleep  3
@@ -840,7 +845,6 @@ Set Multi Ids
   Open Browser  ${USERS.users['${username}'].homepage}  ${USERS.users['${username}'].browser}  alias=ADMIN
   Set Window Size   @{USERS.users['${username}'].size}
   Set Window Position   @{USERS.users['${username}'].position}
-
   Run Keyword And Ignore Error   Wait Until Page Contains Element    xpath=//*[text()='Вхід']   10
   Click Element                      xpath=//*[text()='Вхід']
   Run Keyword And Ignore Error   Wait Until Page Contains Element   id=mForm:email   10
@@ -923,6 +927,17 @@ Set Multi Ids
   Wait until page contains element    id=mForm:mForm:auctions-bidders-btn    10
   Click Element    id=mForm:mForm:auctions-bidders-btn
 
+Потрапити на сторінку кваліфікації кандидата
+  [Arguments]  ${username}  ${tender_uaid}  ${index}
+  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  publicbid.Потрапити на сторінку результатів аукціону
+  ${award_count}=  Get Matching Xpath Count  xpath=//*[@id="mForm:data_data"]/tr
+  ${index}=  publicbid_service.get_award_index  ${index}  ${award_count}
+  ${status}=  Get Text    xpath=//*[@id='mForm:data_data']/tr[1]/td[5]
+  Run Keyword If  '${status}' == 'Визнано переможцем'  Click Element  xpath=//*[@id="mForm:data:${index}:rate-contract-sign-btn"]
+  Run Keyword If  '${status}' != 'Визнано переможцем'  Click Element  xpath=//*[@id='mForm:data:${index}:rate-btn']
+  #Run Keyword If  '${TEST NAME}' == 'Можливість дискваліфікувати другого кандидата'  Click Element  xpath=//*[@id='mForm:data:${index}:rate-btn']
+
 Завантажити протокол аукціону в авард
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${award_index}
   publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
@@ -937,8 +952,9 @@ Set Multi Ids
   Click Element  xpath=//*[@id='mForm:docCard:dcType_5']
   Sleep  2
   Click Element  id=mForm:docCard:dc-save-btn
-  Sleep  2
+  Sleep  3
   Click Element  id=mForm:save-btn
+  Sleep  3
 
 
 Підтвердити наявність протоколу аукціону
