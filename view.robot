@@ -246,21 +246,18 @@ Resource  publicbid.robot
   [Return]  ${return_value}
 
 Отримати інформацію про awards[0].status
-  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
   publicbid.Потрапити на сторінку результатів аукціону
   ${return_value}=  Get Text    xpath=//*[@id='mForm:data_data']/tr[1]/td[5]
   ${return_value}=  publicbid_service.get_awards_status  ${return_value}
   [Return]  ${return_value}
 
 Отримати інформацію про awards[1].status
-  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
   publicbid.Потрапити на сторінку результатів аукціону
   ${return_value}=  Get Text    xpath=//*[@id='mForm:data_data']/tr[2]/td[5]
   ${return_value}=  publicbid_service.get_awards_status  ${return_value}
   [Return]  ${return_value}
 
 Отримати інформацію про awards[-1].status
-  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
   publicbid.Потрапити на сторінку результатів аукціону
   ${return_value}=  Get Text    xpath=//*[@id='mForm:data_data']/tr[2]/td[5]
   ${return_value}=  publicbid_service.get_awards_status  ${return_value}
