@@ -769,8 +769,7 @@ Set Multi Ids
   Select Checkbox  xpath=//*[@id="mForm:cdRateRejectPanel"]/div[1]/table/tbody/tr[1]/td[1]/input[1]
   Sleep  2
   Click Element  id=mForm:bRS
-  Wait Until Element Is Visible  id=notifyBar  120
-  Sleep  2
+  Sleep  10
   Capture Page Screenshot
 
 
