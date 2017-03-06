@@ -754,8 +754,9 @@ Set Multi Ids
   Capture Page Screenshot
   Run Keyword If  '${TEST NAME}' == 'Можливість дискваліфікувати першого кандидата'  publicbid.Потрапити на сторінку кваліфікації кандидата  ${username}  ${tender_uaid}  ${index}
   Run Keyword If  '${TEST NAME}' == 'Можливість дискваліфікувати другого кандидата'  publicbid.Потрапити на сторінку кваліфікації кандидата  ${username}  ${tender_uaid}  ${index}
-  ${status_award1}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[@id="mForm:bDc"]
-  Run Keyword If  ${status_award1} == True  Click Element  xpath=//*[@id="mForm:bDc"]
+  Sleep  5
+  #${status_award1}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[@id="mForm:bDc"]
+  #Run Keyword If  ${status_award1} == True  Click Element  xpath=//*[@id="mForm:bDc"]
   ${status_award2}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[@id="mForm:bD"]
   Run Keyword If  ${status_award2} == True  Click Element  xpath=//*[@id="mForm:bD"]
   Wait Until Page COntains Element  id=mForm:cdDisqualif-yes-btn  10
@@ -767,7 +768,7 @@ Set Multi Ids
   ...  AND
   ...  Sleep  1
   Select Checkbox  xpath=//*[@id="mForm:cdRateRejectPanel"]/div[1]/table/tbody/tr[1]/td[1]/input[1]
-  Sleep  2
+  Sleep  5
   Click Element  id=mForm:bRS
   Sleep  10
   Capture Page Screenshot
@@ -963,9 +964,9 @@ Set Multi Ids
   ${award_count}=  Get Matching Xpath Count  xpath=//*[@id="mForm:data_data"]/tr
   ${award_index}=  publicbid_service.get_award_index  ${award_index}  ${award_count}
   Click Element  xpath=//*[@id='mForm:data:${award_index}:rate-btn']
-  Sleep  3
-  Click Element  id=mForm:j_idt143
-  Sleep  3
-  Click Element  id=mForm:save-btn
-  Sleep  3
+  Sleep  5
+  Click Element  id=mForm:paymentStatusBtn
+  Sleep  5
   Click Element  id=mForm:bRS
+  Sleep  5
+  Click Element  id=mForm:save-btn
