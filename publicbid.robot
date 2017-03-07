@@ -234,7 +234,8 @@ Set Multi Ids
   Click Element                       xpath=//ul[@id="mForm:bidItem_${index}:cReg_items"]/li[text()="м.Київ"]
   Sleep  1
   Input Text                       xpath=//*[@id="mForm:bidItem_${index}:cTer_input"]  ${item_locality}
-  Wait Until Page Contains Element  id=mForm:bidItem_${index}:cTer_panel  10
+  Sleep  10
+  #Wait Until Page Contains Element  id=mForm:bidItem_${index}:cTer_panel  10
   Click Element                       xpath=//*[@id="mForm:bidItem_${index}:cTer_panel"]/ul/li[1]
   Sleep  1
   Input text                          id=mForm:bidItem_${index}:zc  ${item_delivery_postal_code}
@@ -282,7 +283,7 @@ Set Multi Ids
   \  Input Text   id=mForm:search-by-number-input  ${tender_uaid}
   \  Press Key  id=mForm:search-by-number-input  \\13
   \  Sleep  5
-  Sleep  1
+  Sleep  5
   Click Element    xpath=//p[contains(text(), '${tender_uaid}')]/ancestor::div[1]/span[2]/a
   Wait Until Page Contains Element  id=mForm:nBid  30
   Capture Page Screenshot
@@ -656,9 +657,13 @@ Set Multi Ids
   Log  ${username}
   Log  ${tender_uaid}
   Log  ${index}
-  Пошук учасника закупівлі  ${username}  ${tender_uaid}  ${index}
-  Click Element  id=mForm:bDc
-  Wait Until Page Contains Element  id=primefacesmessagedlg  60
+  #Пошук учасника закупівлі  ${username}  ${tender_uaid}  ${index}
+  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  publicbid.Потрапити на сторінку результатів аукціону
+  Sleep  3
+  Click Element  id=mForm:rate-cancel-btn
+  Sleep  10
+  #Wait Until Page Contains Element  id=primefacesmessagedlg  60
 
 
 Завантажити документ рішення кваліфікаційної комісії
