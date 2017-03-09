@@ -267,7 +267,7 @@ Set Multi Ids
   ...      ${username} ==  username
   ...      ${tender_uaid} ==  tender_uaid
   Click Element  xpath=//a[./text()="Електронні торги"]
-  Wait Until Page Contains Element    id=mForm:search_button   10
+  Wait Until Page Contains Element    id=mForm:search_button   15
   Click Element  xpath=//*[text()='Переглянути тестові електронні торги']
   Wait Until Page Contains Element  xpath=//*[text()='ТЕСТОВИЙ РЕЖИМ']  40
   Click Element  xpath=//*[@id="buttons"]/button[4]
