@@ -853,7 +853,7 @@ Set Multi Ids
   Run Keyword And Ignore Error   Wait Until Page Contains Element    xpath=//*[text()='Вхід']   10
   Click Element                      xpath=//*[text()='Вхід']
   Run Keyword And Ignore Error   Wait Until Page Contains Element   id=mForm:email   10
-  Input text   id=mForm:email      test_eauction@yopmail.com
+  Input text   id=mForm:email      leksoz84@gmail.com
   Input text   id=mForm:pwd      P@ssw0rd
   Click Button   id=mForm:login
   Sleep  3
