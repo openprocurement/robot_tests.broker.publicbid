@@ -247,19 +247,21 @@ Resource  publicbid.robot
 
 Отримати інформацію про awards[0].status
   publicbid.Потрапити на сторінку результатів аукціону
-  ${return_value}=  Get Text    xpath=//*[@id='mForm:data_data']/tr[1]/td[5]
+  ${return_value}=  Get Text    xpath=//td[text()='1']/ancestor::tr[1]/td[5]
   ${return_value}=  publicbid_service.get_awards_status  ${return_value}
   [Return]  ${return_value}
 
 Отримати інформацію про awards[1].status
+  Run Keyword If  "${TEST NAME}" != "Відображення статусу 'очікується протокол' для другого кандидата"  publicbid.Потрапити на сторінку результатів аукціону
   publicbid.Потрапити на сторінку результатів аукціону
-  ${return_value}=  Get Text    xpath=//*[@id='mForm:data_data']/tr[2]/td[5]
+  ${return_value}=  Get Text    xpath=//td[text()='2']/ancestor::tr[1]/td[5]
   ${return_value}=  publicbid_service.get_awards_status  ${return_value}
   [Return]  ${return_value}
 
 Отримати інформацію про awards[-1].status
+  Run Keyword If  "${TEST NAME}" != "Відображення статусу 'очікується протокол' для другого кандидата"  publicbid.Потрапити на сторінку результатів аукціону
   publicbid.Потрапити на сторінку результатів аукціону
-  ${return_value}=  Get Text    xpath=//*[@id='mForm:data_data']/tr[2]/td[5]
+  ${return_value}=  Get Text    xpath=//td[text()='2']/ancestor::tr[1]/td[5]
   ${return_value}=  publicbid_service.get_awards_status  ${return_value}
   [Return]  ${return_value}
 
