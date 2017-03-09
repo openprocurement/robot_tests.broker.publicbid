@@ -661,7 +661,7 @@ Set Multi Ids
   publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
   publicbid.Потрапити на сторінку результатів аукціону
   Sleep  3
-  Click Element  id=mForm:rate-cancel-btn
+  Click Element  xpath=//*[@id='mForm:data:1:rate-cancel-btn']
   Sleep  10
   #Wait Until Page Contains Element  id=primefacesmessagedlg  60
 
