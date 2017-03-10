@@ -267,7 +267,7 @@ Set Multi Ids
   ...      ${username} ==  username
   ...      ${tender_uaid} ==  tender_uaid
   Click Element  xpath=//a[./text()="Електронні торги"]
-  Wait Until Page Contains Element    id=mForm:search_button   15
+  Wait Until Page Contains Element    id=mForm:search_button   20
   Click Element  xpath=//*[text()='Переглянути тестові електронні торги']
   Wait Until Page Contains Element  xpath=//*[text()='ТЕСТОВИЙ РЕЖИМ']  40
   Click Element  xpath=//*[@id="buttons"]/button[4]
@@ -662,7 +662,7 @@ Set Multi Ids
   publicbid.Потрапити на сторінку результатів аукціону
   Sleep  3
   Click Element  xpath=//*[@id='mForm:data:1:rate-cancel-btn']
-  Sleep  20
+  Sleep  15
   Reload Page
   #Wait Until Page Contains Element  id=primefacesmessagedlg  60
 
