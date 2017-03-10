@@ -662,7 +662,8 @@ Set Multi Ids
   publicbid.Потрапити на сторінку результатів аукціону
   Sleep  3
   Click Element  xpath=//*[@id='mForm:data:1:rate-cancel-btn']
-  Sleep  10
+  Sleep  20
+  Reload Page
   #Wait Until Page Contains Element  id=primefacesmessagedlg  60
 
 
@@ -971,6 +972,8 @@ Set Multi Ids
   Click Element  xpath=//*[@id='mForm:data:${award_index}:rate-btn']
   Sleep  5
   Click Element  id=mForm:paymentStatusBtn
+  Sleep  3
+  Reload Page
   Sleep  5
   Click Element  id=mForm:bRS
   Sleep  5
