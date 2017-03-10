@@ -972,9 +972,7 @@ Set Multi Ids
   Click Element  xpath=//*[@id='mForm:data:${award_index}:rate-btn']
   Sleep  5
   Click Element  id=mForm:paymentStatusBtn
-  Sleep  3
-  Reload Page
-  Sleep  5
+  Sleep  7
   Click Element  id=mForm:bRS
   Sleep  5
   Click Element  id=mForm:save-btn
