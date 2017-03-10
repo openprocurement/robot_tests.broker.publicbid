@@ -202,7 +202,6 @@ Resource  publicbid.robot
   [Return]  ${return_value}
 
 Отримати інформацію про auctionPeriod.endDate
-  Capture Page Screenshot
   ${return_value}=  Get Text  xpath=//*[@id="mForm:auctionEndDate"]
   ${return_value}=  publicbid_service.parse date  ${return_value}
   [Return]  ${return_value}
