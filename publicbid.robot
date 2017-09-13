@@ -366,7 +366,7 @@ Set Multi Ids
   publicbid.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Click Element  xpath=//*[text()='Подати пропозицію в тестовому режимі']
 
-  Wait Until Page Contagins  Картка пропозиції  10
+  Selenium2Library.Wait Until Page Contains  Картка пропозиції  10
 
   RUN KEYWORD IF  '${MODE}' != 'dgfInsider'  RUN KEYWORDS
   ...  ${amount}=  RUN KEYWORD AND RETURN  convert to string  ${amount}  AND
