@@ -500,20 +500,37 @@ Set Multi Ids
 Подати цінову пропозицію
   [Arguments]  @{ARGUMENTS}
   [Documentation]
-  ...      ${ARGUMENTS[0]} ==  username
-  ...      ${ARGUMENTS[1]} ==  ${TENDER_UAID}
-  ...      ${ARGUMENTS[2]} ==  ${test_bid_data}
-  Sleep  120
-  ${amount}=        Get From Dictionary   ${ARGUMENTS[2].data.value}         amount
-  publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
-  ${tender_status}=  Get Text  xpath=//*[@id="mForm:data:status"]
-  Run Keyword If  '${tender_status}' == 'Період уточнень'  Fail  "Неможливо подати цінову пропозицію в період уточнень"
-  Click Element  xpath=//*[text()='Зареєструвати пропозицію']
-  Sleep  2
-  Input Text  xpath=//*[@id="mForm:data:amount"]  ${amount}
-  Input Text  xpath=//*[@id="mForm:data:rName"]  Тестовий закупівельник
-  Input Text  xpath=//*[@id="mForm:data:rPhone"]  ${telephone}
-  Input Text  xpath=//*[@id="mForm:data:rMail"]  ${mail}
+  ...      ${username} ==  username
+  ...      ${tender_uaid} ==  tender_uaid
+  ...      ${bid_data} ==  bid_data
+  Log  ${MODE}
+  ${amount}=  RUN KEYWORD AND RETURN IF  '${MODE}' != 'dgfInsider'  Get From Dictionary   ${bid_data.data.value}  amount
+  publicbid.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
+  Click Element  xpath=//*[text()='Подати пропозицію в тестовому режимі']
+
+  Wait Until Page Contagins  Картка пропозиції  10
+
+  RUN KEYWORD IF  '${MODE}' != 'dgfInsider'  RUN KEYWORDS
+  ...  ${amount}=  RUN KEYWORD AND RETURN  convert to string  ${amount}  AND
+  ...  Input Text  xpath=//*[@id="mForm:amount"]  ${amount}  AND
+  ...  ${financial_license_path}  ${file_title}  ${file_content}=  RUN KEYWORD AND RETURN  create_fake_doc  AND
+  ...  choose file  id=mForm:qFile_input  ${financial_license_path}  AND
+  ...  Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10  AND
+  ...  Click Element  id=mForm:docCard:dcType_label  AND
+  ...  Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10  AND
+  ...  Click Element  id=mForm:docCard:dcType_3  AND
+  ...  Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]  AND
+  ...  Sleep  2
+
+
+  Input Text  xpath=//*[@id="mForm:rName"]  Тестовий закупівельник
+  Input Text  xpath=//*[@id="mForm:rPhone"]  ${telephone}
+  Input Text  xpath=//*[@id="mForm:rMail"]  ${mail}
+  Click Element  xpath=//*[@id="mForm:contractChoice"]
+  Wait Until Page Contains Element  xpath=//*[@id="mForm:contractChoice_items"]  10
+  Wait Until Element Is Visible  xpath=//*[@id="mForm:contractChoice_items"]  10
+  Click Element  xpath=//*[@id="mForm:contractChoice_1"]
+  Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[text()='Зберегти']
   Sleep  3
   Click Element  xpath=//*[@id="mForm:infoBar"]/div[3]/button/span[2]
