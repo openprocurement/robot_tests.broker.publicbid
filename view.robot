@@ -4,7 +4,6 @@ Library  String
 Library  DateTime
 Library  publicbid_json_util.py
 Library  publicbid_service.py
-Resource  publicbid.robot
 
 *** Keywords ***
 Отримати інформацію про value.currency
@@ -240,6 +239,8 @@ Resource  publicbid.robot
 
 Отримати інформацію про tenderAttempts
   ${return_value}=  Get Text  id=mForm:tenderAttempts_label
+  ${return_value}=  publicbid_service.get_tender_attempts  ${return_value}
+  Run Keyword If  ${return_value} is ${None}  Fail
   [Return]  ${return_value}
 
 Отримати інформацію про procurementMethodType
