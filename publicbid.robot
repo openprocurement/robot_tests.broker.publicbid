@@ -83,6 +83,8 @@ ${bid_number}
   ...             ELSE  Click Element  id=mForm:procurementType_1
   Sleep  3
   Click Element                       id=mForm:chooseProcurementTypeBtn
+  Sleep  5
+  Click Element                       id=mForm:j_idt91:j_idt94
   Wait Until Page Contains Element    id=mForm:name  10
   Input Text                          id=mForm:dgfID  ${dgfID}
   Input text                          id=mForm:name     ${title}
@@ -112,7 +114,7 @@ ${bid_number}
   # Save
   Execute JavaScript  window.scrollTo(0,0)
   Click Element                       xpath=//*[@id="mForm:bSave"]
-  Wait Until Element Is Visible  id=notifyBar  60
+  Wait Until Element Is Visible  id=notifyBar  120
   Sleep  3
   Click Element                       xpath=//*[@id="mForm:needAnnounce"]/div[3]/button/span
   Sleep   5
@@ -120,7 +122,7 @@ ${bid_number}
   Click Element                       xpath=//span[text()="ОГОЛОСИТИ ТОРГИ У ТЕСТОВОМУ РЕЖИМІ"]
   Sleep   2
   # Confirm in message box
-  Click Element                       xpath=//div[contains(@class, "ui-confirm-diaLog") and @aria-hidden="false"]//span[text()="Оголосити"]
+  Click Element                       xpath=//div[contains(@class, "ui-confirm-dialog") and @aria-hidden="false"]//span[text()="Оголосити"]
   Sleep   5
   Click Element                       xpath=//span[contains(@class, "ui-button-text ui-c") and text()="Так"]
   # More smart wait for id is needed there.
@@ -164,7 +166,7 @@ ${bid_number}
   Завантажити документ до тендеру  ${file}  doc
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[@id="mForm:bSave"]
-  Wait Until Element Is Visible  xpath=//*[text()='Збережено!']  120
+  Wait Until Element Is Visible  xpath=//*[text()='Збережено!']  40
   Capture Page Screenshot
   Sleep  5
 
@@ -176,7 +178,7 @@ ${bid_number}
   Завантажити документ до тендеру  ${file}  illustration
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[@id="mForm:bSave"]
-  Wait Until Element Is Visible  xpath=//*[text()='Збережено!']  120
+  Wait Until Element Is Visible  xpath=//*[text()='Збережено!']  40
   Capture Page Screenshot
   Sleep  5
 
@@ -186,7 +188,7 @@ ${bid_number}
   Додати посилання до тендеру  ${vdr_link}  vdr  Посилання на VDR
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[@id="mForm:bSave"]
-  Wait Until Element Is Visible  xpath=//*[text()='Збережено!']  120
+  Wait Until Element Is Visible  xpath=//*[text()='Збережено!']  40
   Capture Page Screenshot
   Sleep  5
 
@@ -232,7 +234,8 @@ Set Multi Ids
   Click Element                       xpath=//ul[@id="mForm:bidItem_${index}:cReg_items"]/li[text()="м.Київ"]
   Sleep  1
   Input Text                       xpath=//*[@id="mForm:bidItem_${index}:cTer_input"]  ${item_locality}
-  Wait Until Page Contains Element  id=mForm:bidItem_${index}:cTer_panel  10
+  Sleep  10
+  #Wait Until Page Contains Element  id=mForm:bidItem_${index}:cTer_panel  10
   Click Element                       xpath=//*[@id="mForm:bidItem_${index}:cTer_panel"]/ul/li[1]
   Sleep  1
   Input text                          id=mForm:bidItem_${index}:zc  ${item_delivery_postal_code}
@@ -264,9 +267,9 @@ Set Multi Ids
   ...      ${username} ==  username
   ...      ${tender_uaid} ==  tender_uaid
   Click Element  xpath=//a[./text()="Електронні торги"]
-  Wait Until Page Contains Element    id=mForm:search_button   10
+  Wait Until Page Contains Element    id=mForm:search_button   20
   Click Element  xpath=//*[text()='Переглянути тестові електронні торги']
-  Wait Until Page Contains Element  xpath=//*[text()='ТЕСТОВИЙ РЕЖИМ']  60
+  Wait Until Page Contains Element  xpath=//*[text()='ТЕСТОВИЙ РЕЖИМ']  40
   Click Element  xpath=//*[@id="buttons"]/button[4]
   Wait Until Page Contains Element  id=mForm:search-by-number-input  3
   Input Text   id=mForm:search-by-number-input  ${tender_uaid}
@@ -280,7 +283,7 @@ Set Multi Ids
   \  Input Text   id=mForm:search-by-number-input  ${tender_uaid}
   \  Press Key  id=mForm:search-by-number-input  \\13
   \  Sleep  5
-  Sleep  1
+  Sleep  5
   Click Element    xpath=//p[contains(text(), '${tender_uaid}')]/ancestor::div[1]/span[2]/a
   Wait Until Page Contains Element  id=mForm:nBid  30
   Capture Page Screenshot
@@ -391,7 +394,7 @@ Set Multi Ids
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[text()='Зберегти']
   Wait Until Page Contains Element  xpath=//*[@id="mForm:proposalSaveInfo"]/div[3]/button  10
-  Sleep  2
+  Sleep  5
   Click Element  xpath=//*[@id="mForm:proposalSaveInfo"]/div[3]/button
   Sleep  2
   ${is_qualified}=  Get From Dictionary  ${bid_data.data}  qualified
@@ -664,9 +667,14 @@ Set Multi Ids
   Log  ${username}
   Log  ${tender_uaid}
   Log  ${index}
-  Пошук учасника закупівлі  ${username}  ${tender_uaid}  ${index}
-  Click Element  id=mForm:bDc
-  Wait Until Page Contains Element  id=primefacesmessagedlg  60
+  #Пошук учасника закупівлі  ${username}  ${tender_uaid}  ${index}
+  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  publicbid.Потрапити на сторінку результатів аукціону
+  Sleep  3
+  Click Element  xpath=//*[@id='mForm:data:1:rate-cancel-btn']
+  Sleep  15
+  Reload Page
+  #Wait Until Page Contains Element  id=primefacesmessagedlg  60
 
 
 Завантажити документ рішення кваліфікаційної комісії
@@ -760,7 +768,13 @@ Set Multi Ids
   Log  ${index}
   Log  ${description}
   Capture Page Screenshot
-  Click Element  id=mForm:bD
+  Run Keyword If  '${TEST NAME}' == 'Можливість дискваліфікувати першого кандидата'  publicbid.Потрапити на сторінку кваліфікації кандидата  ${username}  ${tender_uaid}  ${index}
+  Run Keyword If  '${TEST NAME}' == 'Можливість дискваліфікувати другого кандидата'  publicbid.Потрапити на сторінку кваліфікації кандидата  ${username}  ${tender_uaid}  ${index}
+  Sleep  5
+  #${status_award1}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[@id="mForm:bDc"]
+  #Run Keyword If  ${status_award1} == True  Click Element  xpath=//*[@id="mForm:bDc"]
+  ${status_award2}=  Run Keyword And Return Status  Page Should Contain Element  xpath=//*[@id="mForm:bD"]
+  Run Keyword If  ${status_award2} == True  Click Element  xpath=//*[@id="mForm:bD"]
   Wait Until Page COntains Element  id=mForm:cdDisqualif-yes-btn  10
   Click Element  id=mForm:cdDisqualif-yes-btn
   Sleep  3
@@ -770,10 +784,9 @@ Set Multi Ids
   ...  AND
   ...  Sleep  1
   Select Checkbox  xpath=//*[@id="mForm:cdRateRejectPanel"]/div[1]/table/tbody/tr[1]/td[1]/input[1]
-  Sleep  2
+  Sleep  5
   Click Element  id=mForm:bRS
-  Wait Until Element Is Visible  id=notifyBar  120
-  Sleep  2
+  Sleep  10
   Capture Page Screenshot
 
 
@@ -848,11 +861,10 @@ Set Multi Ids
   Open Browser  ${USERS.users['${username}'].homepage}  ${USERS.users['${username}'].browser}  alias=ADMIN
   Set Window Size   @{USERS.users['${username}'].size}
   Set Window Position   @{USERS.users['${username}'].position}
-
   Run Keyword And Ignore Error   Wait Until Page Contains Element    xpath=//*[text()='Вхід']   10
   Click Element                      xpath=//*[text()='Вхід']
   Run Keyword And Ignore Error   Wait Until Page Contains Element   id=mForm:email   10
-  Input text   id=mForm:email      test_eauction@yopmail.com
+  Input text   id=mForm:email      leksoz84@gmail.com
   Input text   id=mForm:pwd      P@ssw0rd
   Click Button   id=mForm:login
   Sleep  3
@@ -924,3 +936,53 @@ Set Multi Ids
   Click Element  id=mForm:docCard:dc-save-btn
   Sleep  5
   Capture Page Screenshot
+
+Потрапити на сторінку результатів аукціону
+  Wait until page contains element    id=mForm:auction-results-btn    10
+  Click Element    id=mForm:auction-results-btn
+  Wait until page contains element    id=mForm:mForm:auctions-bidders-btn    10
+  Click Element    id=mForm:mForm:auctions-bidders-btn
+
+Потрапити на сторінку кваліфікації кандидата
+  [Arguments]  ${username}  ${tender_uaid}  ${index}
+  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  publicbid.Потрапити на сторінку результатів аукціону
+  ${award_count}=  Get Matching Xpath Count  xpath=//*[@id="mForm:data_data"]/tr
+  ${index}=  publicbid_service.get_award_index  ${index}  ${award_count}
+  ${status}=  Get Text    xpath=//*[@id='mForm:data_data']/tr[1]/td[5]
+  Run Keyword If  '${status}' == 'Визнано переможцем'  Click Element  xpath=//*[@id="mForm:data:${index}:rate-contract-sign-btn"]
+  Run Keyword If  '${status}' != 'Визнано переможцем'  Click Element  xpath=//*[@id='mForm:data:${index}:rate-btn']
+  #Run Keyword If  '${TEST NAME}' == 'Можливість дискваліфікувати другого кандидата'  Click Element  xpath=//*[@id='mForm:data:${index}:rate-btn']
+
+Завантажити протокол аукціону в авард
+  [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${award_index}
+  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  publicbid.Потрапити на сторінку результатів аукціону
+  ${award_count}=  Get Matching Xpath Count  xpath=//*[@id="mForm:data_data"]/tr
+  ${award_index}=  publicbid_service.get_award_index  ${award_index}  ${award_count}
+  Click Element  xpath=//*[@id='mForm:data:${award_index}:rate-btn']
+  Choose File    xpath=//*[@id='mForm:tdFile_input']    ${filepath}
+  Sleep  5
+  Click Element  id=mForm:docCard:dcType_label
+  Sleep  2
+  Click Element  xpath=//*[@id='mForm:docCard:dcType_5']
+  Sleep  2
+  Click Element  id=mForm:docCard:dc-save-btn
+  Sleep  3
+  Click Element  id=mForm:save-btn
+  Sleep  3
+
+
+Підтвердити наявність протоколу аукціону
+  [Arguments]  ${username}  ${tender_uaid}  ${award_index}
+  publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
+  publicbid.Потрапити на сторінку результатів аукціону
+  ${award_count}=  Get Matching Xpath Count  xpath=//*[@id="mForm:data_data"]/tr
+  ${award_index}=  publicbid_service.get_award_index  ${award_index}  ${award_count}
+  Click Element  xpath=//*[@id='mForm:data:${award_index}:rate-btn']
+  Sleep  5
+  Click Element  id=mForm:paymentStatusBtn
+  Sleep  7
+  Click Element  id=mForm:bRS
+  Sleep  5
+  Click Element  id=mForm:save-btn
