@@ -364,23 +364,33 @@ Set Multi Ids
   ...      ${username} ==  username
   ...      ${tender_uaid} ==  tender_uaid
   ...      ${bid_data} ==  bid_data
-  ${amount}=  Get From Dictionary   ${bid_data.data.value}  amount
+  Log  ${MODE}
+  ${amount}=  RUN KEYWORD AND RETURN IF  '${MODE}' != 'dgfInsider'  Get From Dictionary   ${bid_data.data.value}  amount
   publicbid.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Click Element  xpath=//*[text()='Подати пропозицію в тестовому режимі']
-  Wait Until Page Contains Element  id=mForm:amount  10
-  ${amount}=  convert to string  ${amount}
-  Input Text  xpath=//*[@id="mForm:amount"]  ${amount}
-  ${financial_license_path}  ${file_title}  ${file_content}=  create_fake_doc
-  choose file  id=mForm:qFile_input  ${financial_license_path}
-  Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10
-  Click Element  id=mForm:docCard:dcType_label
-  Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10
-  Click Element  id=mForm:docCard:dcType_3
-  Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]
-  Sleep  2
+
+  Selenium2Library.Wait Until Page Contains  Картка пропозиції  10
+
+  RUN KEYWORD IF  '${MODE}' != 'dgfInsider'  RUN KEYWORDS
+  ...  ${amount}=  RUN KEYWORD AND RETURN  convert to string  ${amount}  AND
+  ...  Input Text  xpath=//*[@id="mForm:amount"]  ${amount}  AND
+  ...  ${financial_license_path}  ${file_title}  ${file_content}=  RUN KEYWORD AND RETURN  create_fake_doc  AND
+  ...  choose file  id=mForm:qFile_input  ${financial_license_path}  AND
+  ...  Wait Until Page Contains Element    xpath=//*[text()='Картка документу']  10  AND
+  ...  Click Element  id=mForm:docCard:dcType_label  AND
+  ...  Wait Until Page Contains Element  id=mForm:docCard:dcType_panel  10  AND
+  ...  Click Element  id=mForm:docCard:dcType_3  AND
+  ...  Click Element  xpath=//*[@id="mForm:docCard:docCard"]/table/tfoot/tr/td/button[1]  AND
+  ...  Sleep  2
+
+
   Input Text  xpath=//*[@id="mForm:rName"]  Тестовий закупівельник
   Input Text  xpath=//*[@id="mForm:rPhone"]  ${telephone}
   Input Text  xpath=//*[@id="mForm:rMail"]  ${mail}
+  Click Element  xpath=//*[@id="mForm:contractChoice"]
+  Wait Until Page Contains Element  xpath=//*[@id="mForm:contractChoice_items"]  10
+  Wait Until Element Is Visible  xpath=//*[@id="mForm:contractChoice_items"]  10
+  Click Element  xpath=//*[@id="mForm:contractChoice_1"]
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[text()='Зберегти']
   Wait Until Page Contains Element  xpath=//*[@id="mForm:proposalSaveInfo"]/div[3]/button  10

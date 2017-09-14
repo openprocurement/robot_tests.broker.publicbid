@@ -25,9 +25,12 @@ Resource  publicbid.robot
   [Return]  ${return_value}
 
 Отримати інформацію про value.amount
-  ${return_value}=   Get Value  xpath=//*[@id="mForm:budget"]
+  ${return_value}=  Get Value  xpath=//*[@id="mForm:budget"]
   Log  ${return_value}
-  ${return_value}=   Convert To Number   ${return_value}
+  ${return_value}=  publicbid_service.string_replace  ${return_value}  ${space}  ${empty}
+  ${return_value}=  publicbid_service.string_replace  ${return_value}  ,  .
+  Log  ${return_value}
+  ${return_value}=  Convert To Number   ${return_value}
   [Return]  ${return_value}
 
 Отримати інформацію про auctionID

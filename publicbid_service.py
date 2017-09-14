@@ -10,6 +10,14 @@ from robot.libraries.BuiltIn import BuiltIn
 TZ = pytz.timezone('Europe/Kiev')
 
 
+def convert_date(date_str, from_pattern, to_pattern):
+    date_str = datetime.strptime(date_str, from_pattern)
+    date = datetime(date_str.year, date_str.month, date_str.day, date_str.hour, date_str.minute, date_str.second,
+                    date_str.microsecond)
+    return_date = date.strftime(to_pattern)
+    return return_date
+
+
 def get_tender_code(key):
     tender_status_codes = {
         "Період аукціону": "active.auction",
@@ -37,7 +45,8 @@ def get_awards_status(key):
 def get_tender_type(key):
     tender_types = {
         "Майно банків": "dgfOtherAssets",
-        "Права вимоги": "dgfFinancialAssets"
+        "Права вимоги": "dgfFinancialAssets",
+        "Голландський аукціон": "dgfInsider"
     }
     return tender_types[unicode(key).encode('utf-8')]
 
@@ -47,14 +56,6 @@ def get_cancellation_code(key):
         "Скасування активоване": "active"
     }
     return cancellation_codes[unicode(key).encode('utf-8')]
-
-
-def convert_date(date_str, from_pattern, to_pattern):
-    date_str = datetime.strptime(date_str, from_pattern)
-    date = datetime(date_str.year, date_str.month, date_str.day, date_str.hour, date_str.minute, date_str.second,
-                    date_str.microsecond)
-    return_date = date.strftime(to_pattern)
-    return return_date
 
 
 def parse_date(date_str):
@@ -96,8 +97,13 @@ def get_field_id(field_id):
         'minimalStep.amount': 'mForm:step',
         'title': 'mForm:name'
     }
-
     return fields[field_id]
+
+
+def string_replace(value, from_text, to_text):
+    value = value.encode('ascii', 'ignore')
+    return value.replace(from_text, to_text)
+
 
 
 def get_field_value(field_id, field_value):
