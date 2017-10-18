@@ -23,10 +23,12 @@ ${bid_number}
 Підготувати клієнт для користувача
   [Arguments]  @{ARGUMENTS}
   [Documentation]  Відкрити браузер, створити об’єкт api wrapper, тощо
-  ...      ${ARGUMENTS[0]} ==  username
+  ...      ${ARGUMENTS[0]} == username
   Log  ${USERS.users['${ARGUMENTS[0]}'].homepage}
   Log  ${USERS.users['${ARGUMENTS[0]}'].browser}
-  Open Browser  ${USERS.users['${ARGUMENTS[0]}'].homepage}  ${USERS.users['${ARGUMENTS[0]}'].browser}  alias=${ARGUMENTS[0]}
+  ${alias}=  Catenate  SEPARATOR=role_  ${ARGUMENTS[0]}
+  Set Global Variable  ${BROWSER_ALIAS}  ${alias}
+  Open Browser  ${USERS.users['${ARGUMENTS[0]}'].homepage}  ${USERS.users['${ARGUMENTS[0]}'].browser}  alias=${BROWSER_ALIAS}
   Set Window Size   @{USERS.users['${ARGUMENTS[0]}'].size}
   Set Window Position   @{USERS.users['${ARGUMENTS[0]}'].position}
   Run Keyword If   '${ARGUMENTS[0]}' != 'Publicbid_Viewer'   Вхід  ${ARGUMENTS[0]}
@@ -291,8 +293,10 @@ Set Multi Ids
 Отримати інформацію із тендера
   [Arguments]  @{ARGUMENTS}
   Log Many  @{ARGUMENTS}
-  Switch browser   ${ARGUMENTS[0]}
+  Log  ${BROWSER_ALIAS}
+  Switch browser   ${BROWSER_ALIAS}
   Log  ${TENDER['TENDER_UAID']}
+  Capture Page Screenshot
   Run Keyword And Return  view.Отримати інформацію про ${ARGUMENTS[2]}
 
 Отримати інформацію із предмету
@@ -355,7 +359,7 @@ Set Multi Ids
   [Documentation]
   ...      ${ARGUMENTS[0]} =  username
   ...      ${ARGUMENTS[1]} =  ${TENDER_UAID}
-  Switch Browser    ${ARGUMENTS[0]}
+  Switch Browser    ${BROWSER_ALIAS}
   publicbid.Пошук тендера по ідентифікатору    ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
 
 Подати цінову пропозицію
@@ -364,6 +368,7 @@ Set Multi Ids
   ...      ${username} ==  username
   ...      ${tender_uaid} ==  tender_uaid
   ...      ${bid_data} ==  bid_data
+  Switch Browser    ${BROWSER_ALIAS}
   Log  ${MODE}
   ${amount}=  RUN KEYWORD AND RETURN IF  '${MODE}' != 'dgfInsider'  Get From Dictionary   ${bid_data.data.value}  amount
   publicbid.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
@@ -388,9 +393,9 @@ Set Multi Ids
   Input Text  xpath=//*[@id="mForm:rPhone"]  ${telephone}
   Input Text  xpath=//*[@id="mForm:rMail"]  ${mail}
   Click Element  xpath=//*[@id="mForm:contractChoice"]
-  Wait Until Page Contains Element  xpath=//*[@id="mForm:contractChoice_items"]  10
-  Wait Until Element Is Visible  xpath=//*[@id="mForm:contractChoice_items"]  10
-  Click Element  xpath=//*[@id="mForm:contractChoice_1"]
+  Sleep  2
+  ${present}=  Run Keyword And Return Status    Element Should Be Visible   xpath=//*[@id="mForm:contractChoice_items"]
+  Run Keyword If    ${present}    Обрати угоду для подачі пропозиції
   Execute JavaScript  window.scrollTo(0,0)
   Click Element  xpath=//*[text()='Зберегти']
   Wait Until Page Contains Element  xpath=//*[@id="mForm:proposalSaveInfo"]/div[3]/button  10
@@ -412,6 +417,9 @@ Set Multi Ids
   reload page
   Capture Page Screenshot
   [Return]  ${bid_number}
+
+Обрати угоду для подачі пропозиції
+  Click Element  xpath=//*[@id="mForm:contractChoice_1"]
 
 Отримати інформацію із пропозиції
   [Arguments]  @{ARGUMENTS}
@@ -440,7 +448,7 @@ Set Multi Ids
   ...  Click Element  xpath=//a[contains(text(), 'Пропозиція № ${USERS.users['${username}'].bidresponses.resp}')]
   ...  ELSE
   ...  Click Element  xpath=//a[contains(text(), '${tender_uaid}')]/ancestor::div[2]/div[1]/div/span[1]/a
-  Wait Until Page Contains Element  id=mForm:amount  30
+  Wait Until Page Contains Element  xpath=//*[contains(text(), 'Картка пропозиції')]  30
   Capture Page Screenshot
 
 Відповісти на питання
@@ -477,7 +485,7 @@ Set Multi Ids
   [Return]  ${url}
 
 Отримати посилання на аукціон для учасника
-  [Arguments]  ${username}  ${tender_uaid}
+  [Arguments]  ${username}  ${tender_uaid}  @{ARGUMENTS}
   [Documentation]
   ...   ${username} === username
   ...   ${tender_uaid} == tender_uaid
@@ -837,6 +845,15 @@ Set Multi Ids
 
 Завантажити фінансову ліцензію
   [Arguments]  ${username}  ${tender_uaid}  ${license_path}
+  Пошук цінової пропозиції  ${username}  ${tender_uaid}
+  Choose File  id=mForm:licenceAddFileBtn_input  ${license_path}
+  Sleep  3
+  Click Element  id=mForm:docCard:dc-save-btn
+  Sleep  5
+  Capture Page Screenshot
+  Execute JavaScript  window.scrollTo(0,0)
+  Click Element  id=mForm:proposalSaveBtn
+  Wait Until Element Is Visible  id=notifyBar  120
   Capture Page Screenshot
 
 
