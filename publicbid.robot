@@ -26,9 +26,9 @@ ${bid_number}
   ...      ${ARGUMENTS[0]} == username
   Log  ${USERS.users['${ARGUMENTS[0]}'].homepage}
   Log  ${USERS.users['${ARGUMENTS[0]}'].browser}
-  ${alias}=  Catenate  SEPARATOR=role_  ${ARGUMENTS[0]}
-  Set Global Variable  ${BROWSER_ALIAS}  ${alias}
-  Open Browser  ${USERS.users['${ARGUMENTS[0]}'].homepage}  ${USERS.users['${ARGUMENTS[0]}'].browser}  alias=${BROWSER_ALIAS}
+  ${id}=  Open Browser  ${USERS.users['${ARGUMENTS[0]}'].homepage}  ${USERS.users['${ARGUMENTS[0]}'].browser}  alias=${ARGUMENTS[0]}
+  Set Global Variable  ${BROWSER_ALIAS}  ${id}
+  Log  ${BROWSER_ALIAS}
   Set Window Size   @{USERS.users['${ARGUMENTS[0]}'].size}
   Set Window Position   @{USERS.users['${ARGUMENTS[0]}'].position}
   Run Keyword If   '${ARGUMENTS[0]}' != 'Publicbid_Viewer'   Вхід  ${ARGUMENTS[0]}
@@ -72,7 +72,7 @@ ${bid_number}
   ${dkpp_id}=  Convert To String  1.13
   ${tenderAttemptXpath}=  publicbid_service.get_tender_attempts_xpath  ${prepared_tender_data}
 
-  Switch Browser     ${ARGUMENTS[0]}
+  Switch Browser     ${BROWSER_ALIAS}
   Wait Until Page Contains Element    xpath=//*[text()='ОГОЛОСИТИ ЕЛЕКТРОННІ ТОРГИ']   10
   Click Element                       xpath=//*[text()='Переглянути тестові електронні торги']
   Wait Until Page Contains Element    xpath=//*[text()='ТЕСТОВИЙ РЕЖИМ']  60
@@ -268,6 +268,7 @@ Set Multi Ids
   [Documentation]
   ...      ${username} ==  username
   ...      ${tender_uaid} ==  tender_uaid
+  Sleep  3
   Click Element  xpath=//a[./text()="Електронні торги"]
   Wait Until Page Contains Element    id=mForm:search_button   20
   Click Element  xpath=//*[text()='Переглянути тестові електронні торги']
@@ -295,6 +296,7 @@ Set Multi Ids
   Log Many  @{ARGUMENTS}
   Log  ${BROWSER_ALIAS}
   Switch browser   ${BROWSER_ALIAS}
+  Reload Page
   Log  ${TENDER['TENDER_UAID']}
   Capture Page Screenshot
   Run Keyword And Return  view.Отримати інформацію про ${ARGUMENTS[2]}
@@ -321,7 +323,7 @@ Set Multi Ids
 
 Внести зміни в тендер
   [Arguments]  ${username}  ${tender_uaid}  ${field}  ${value}
-  Switch Browser    ${username}
+  Switch Browser    ${BROWSER_ALIAS}
   publicbid.Пошук тендера по ідентифікатору   ${username}   ${tender_uaid}
   Wait Until Page Contains Element   xpath=//*[@id="mForm:status"]   10
   ${field_id}=  publicbid_service.get_field_id  ${field}
@@ -342,7 +344,7 @@ Set Multi Ids
   ${title}=        Get From Dictionary  ${ARGUMENTS[2].data}  title
   ${description}=  Get From Dictionary  ${ARGUMENTS[2].data}  description
 
-  Switch Browser    ${ARGUMENTS[0]}
+  Switch Browser    ${BROWSER_ALIAS}
   publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   Wait Until Page Contains Element   xpath=//*[@id="mForm:status"]   20
   ${tender_status}=  Get Text  xpath=//*[@id="mForm:status"]
@@ -359,7 +361,10 @@ Set Multi Ids
   [Documentation]
   ...      ${ARGUMENTS[0]} =  username
   ...      ${ARGUMENTS[1]} =  ${TENDER_UAID}
+  capture page screenshot
+  Log  ${BROWSER_ALIAS}
   Switch Browser    ${BROWSER_ALIAS}
+  capture page screenshot
   publicbid.Пошук тендера по ідентифікатору    ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
 
 Подати цінову пропозицію
@@ -461,7 +466,7 @@ Set Multi Ids
 
   ${answer}=     Get From Dictionary  ${ARGUMENTS[3].data}  answer
 
-  Switch Browser    ${ARGUMENTS[0]}
+  Switch Browser    ${BROWSER_ALIAS}
   Sleep  5
   publicbid.Пошук тендера по ідентифікатору   ${ARGUMENTS[0]}   ${ARGUMENTS[1]}
   Wait Until Page Contains Element   xpath=//*[@id="mForm:status"]   10
@@ -477,7 +482,7 @@ Set Multi Ids
 
 Отримати посилання на аукціон для глядача
   [Arguments]  ${username}  ${bid_number}  @{ARGUMENTS}
-  Switch Browser    ${username}
+  Switch Browser    ${BROWSER_ALIAS}
   publicbid.Пошук тендера по ідентифікатору  ${username}  ${bid_number}
   Capture Page Screenshot
   Sleep  3
@@ -489,7 +494,7 @@ Set Multi Ids
   [Documentation]
   ...   ${username} === username
   ...   ${tender_uaid} == tender_uaid
-  Switch Browser    ${username}
+  Switch Browser    ${BROWSER_ALIAS}
   publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
   Capture Page Screenshot
   Sleep  3
@@ -894,7 +899,7 @@ Set Multi Ids
   Sleep  5
   Click Element  xpath=//a[contains(text(), '${tender_uaid}')]/ancestor::div[3]/div[4]/div/p[2]/button
   Sleep  5
-  Switch Browser  ${username}
+  Switch Browser  ${BROWSER_ALIAS}
 
 Додати публічний паспорт активу
   [Arguments]  ${username}  ${tender_uaid}  ${doc}
