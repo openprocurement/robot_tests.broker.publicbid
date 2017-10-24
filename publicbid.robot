@@ -269,7 +269,7 @@ Set Multi Ids
   ...      ${username} ==  username
   ...      ${tender_uaid} ==  tender_uaid
   Sleep  3
-  Click Element  xpath=//a[./text()="Електронні торги"]
+  Click Element  xpath=//*[text()="Електронні торги"]
   Wait Until Page Contains Element    id=mForm:search_button   20
   Click Element  xpath=//*[text()='Переглянути тестові електронні торги']
   Wait Until Page Contains Element  xpath=//*[text()='ТЕСТОВИЙ РЕЖИМ']  40
@@ -486,7 +486,7 @@ Set Multi Ids
   publicbid.Пошук тендера по ідентифікатору  ${username}  ${bid_number}
   Capture Page Screenshot
   Sleep  3
-  ${url}=  Get Element Attribute  id=mForm:auctionLink@href
+  ${url}=  Отримати дані із сторінки  mForm:auctionLink  href
   [Return]  ${url}
 
 Отримати посилання на аукціон для учасника
@@ -497,9 +497,17 @@ Set Multi Ids
   Switch Browser    ${BROWSER_ALIAS}
   publicbid.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
   Capture Page Screenshot
-  Sleep  3
-  ${url}=  Get Element Attribute  id=mForm:participationLink@href
+  Sleep  5
+
+  ${url}=  Wait Until Keyword Succeeds  20x  2 sec  Отримати дані із сторінки  mForm:participationLink  href
   [Return]  ${url}
+
+Отримати дані із сторінки
+  [Arguments]  ${id}  ${value}
+  reload page
+  capture page screenshot
+  ${val}=  Get Element Attribute  id=${id}@${value}
+  [Return]  ${val}
 
 Змінити цінову пропозицію
   [Arguments]  ${username}  ${tender_uaid}  ${field}  ${new_amount}
