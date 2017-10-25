@@ -205,8 +205,15 @@ Resource  publicbid.robot
   [Return]  ${return_value}
 
 Отримати інформацію про auctionPeriod.endDate
-  ${return_value}=  Get Text  xpath=//*[@id="mForm:auctionEndDate"]
+  ${return_value}=  Wait Until Keyword Succeeds  20x  5 sec  Отримати текст  mForm:auctionEndDate
   ${return_value}=  publicbid_service.parse date  ${return_value}
+  [Return]  ${return_value}
+
+Отримати текст
+  [Arguments]  ${id}
+  reload page
+  capture page screenshot
+  ${return_value}=  Get Text  id=${id}
   [Return]  ${return_value}
 
 Отримати інформацію про cancellations[0].status
